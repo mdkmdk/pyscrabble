@@ -152,42 +152,40 @@ class Bag:
         pass
 
     def __contains__(self, item):
-        return 10
-#        pdb.set_trace()
-#        # CHECK THIS IS WORKING
-#        print "__contains__ called"
-#        if isinstance(item, Tile):
-#            for t in self.bag_tiles:
-#                if item == t:
-#                    return True
-#            return False        
-#        elif isinstance(item,list) and all([isinstance(a,Tile) for a in item]):
-#            ans = len(item) * [False]
-#            for i,t in enumerate(item):
-#                if t in self.bag_tiles:
-#                    ans[i] = True
-#            print ans
-#            return ans
-#        elif isinstance(item, str):
-#            if len(item) >1:
-#                item = list(item)
-#            ans = len(item) * [False]
-#            for i,ltr in enumerate(item):
-#                if ltr in self.letters:
-#                    ans[i] = True
-#                    del self.letters[i]     
-#            self._populateLetters()
-#            return ans
-#        elif isinstance(item, list) and all([a.isalpha() for a in item]):
-#            ans = len(item) * [False]
-#            for i,ltr in enumerate(item):
-#                if ltr in self.letters:
-#                    ans[i] = True
-#                    del self.letters[i]
-#            self._populateLetters()
-#            return all(ans)
-#        else:
-#            return False
+        #       pdb.set_trace()
+       # CHECK THIS IS WORKING
+       print "__contains__ called"
+       if isinstance(item, Tile):
+           for t in self.bag_tiles:
+               if item == t:
+                   return True
+           return False        
+       elif isinstance(item,list) and all([isinstance(a,Tile) for a in item]):
+           ans = len(item) * [False]
+           for i,t in enumerate(item):
+               if t in self.bag_tiles:
+                   ans[i] = True
+           return all(ans)
+       elif isinstance(item, str):
+           if len(item) >1:
+               item = list(item)
+           ans = len(item) * [False]
+           for i,ltr in enumerate(item):
+               if ltr in self.letters:
+                   ans[i] = True
+                   self.letters.remove(ltr)
+           self._populateLetters()
+           return all(ans)
+       elif isinstance(item, list) and all([a.isalpha() for a in item]):
+           ans = len(item) * [False]
+           for i,ltr in enumerate(item):
+               if ltr in self.letters:
+                   ans[i] = True
+                   self.letters.remove(ltr)
+           self._populateLetters()
+           return all(ans)
+       else:
+            return False
             
      
     def __len__(self):
