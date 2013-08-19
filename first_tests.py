@@ -2,6 +2,7 @@
 import re, os, sys, itertools, random
 import numpy as np
 import pdb
+from pandas import DataFrame, Series
 
 if os.getcwd() == 'N:\\Workspace\\krausm\\Python':
     os.chdir("h:\\scr\\")
@@ -265,6 +266,7 @@ class Board:
         return ans
 
     def parseMove(self, player, move_tuples):
+        # Define Orientation of Primary Move (Not ancillary words)
         orientation = True # True = horizontal, False = vertical
         try:
             moves = DataFrame(move_tuples, columns=['Letter', 'Row', 'Column'])
@@ -272,16 +274,23 @@ class Board:
             return False
 
         # Confirm tiles played are in the player's rack and that they are not used multiple times
-        
+        if not list(moves['Letter']) in player.rack:
+            return False
         
         # Confirm All moves in the same row OR the same column
-        # 
+        # Define the main index (row/col) which the primary words resides in
         if (len(moves.Row.unique()) == 1):
             orientation = True
+            prim_index = moves.Row.unique()
         elif (len(moves.Column.unique()) == 1):
             orientation = False
+            prim_index = moves.Column.unique()
         else:
             return False
+
+        tiles_played = []
+        attachments = []
+            
         # Confirm all words created are valid words
         
         
