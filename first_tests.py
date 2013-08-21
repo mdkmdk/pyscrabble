@@ -1,56 +1,4 @@
-
-import re, os, sys, itertools, random
-import numpy as np
-import pdb
-from pandas import DataFrame, Series
-
-if os.getcwd() == 'N:\\Workspace\\krausm\\Python':
-    os.chdir("h:\\scr\\")
-
-# Setup words list
-sep = os.linesep
-with open('sowpods.txt') as f:
-    WORDS = [w.rstrip(sep) for w in f]
-
-WORDS = sorted(WORDS, key=lambda x: len(x))
-
-# Tuples denote a) number of tiles and b)score
-TILE_DICT = {
-    'a': (9, 1),
-    'b': (2, 3),
-    'c': (2, 3),
-    'd': (4, 2),
-    'e': (12, 1),
-    'f': (2, 4),
-    'g': (3, 2),
-    'h': (2, 4),
-    'i': (9, 1),
-    'j': (1, 8),
-    'k': (1, 5),
-    'l': (4, 1),
-    'm': (2, 3),
-    'n': (6, 1),
-    'o': (8, 1),
-    'p': (2, 3),
-    'q': (1, 10),
-    'r': (6, 1),
-    's': (4, 1),
-    't': (6, 1),
-    'u': (4, 1),
-    'v': (2, 4),
-    'w': (2, 4),
-    'x': (1, 8),
-    'y': (2, 4),
-    'z': (1, 10),
-    ' ': (2, 0)
-    }
-    
-OWNER = set(['BAG', 'BOARD']) # Append player ids once game initiates
-PLAYER_TYPE = set(['AI', 'HUMAN'])
-##############################################################################
-##############################################################################
-##############################################################################
-##############################################################################
+from Consts import *
 
 class Tile:
     def __init__(self, let, scr, t_id, owner):
@@ -230,6 +178,9 @@ class Spot:
 
     def __str__(self):
         return str((self.letter, self.score))
+    
+    def insertLetter(self):
+        pass
 
 class Move:
     def __init__(self, move_tuple):
@@ -246,6 +197,7 @@ class Board:
             self._board[i] = []
             for j in range(15):
                 self._board[i].append(Spot(i, j))
+#               self._board[i].append(None)
 
     def check_move(self, mve):
         pass
@@ -265,7 +217,52 @@ class Board:
             # ans+= "\n" + 15* "|___" + "|"
         return ans
 
+#    def getSpotLetter(self, r_, c_):
+#        let = self._board[r][c].letter
+#        if let == " ":
+#            return None
+#        else:
+#            return let
+    
+    @staticmethod
+    def load(path):
+        '''
+        For testing
+        '''
+        try:
+            import pickle
+            f = open(path, 'r')
+            p = pickle.Unpickler(f)
+            b = Board()
+            b._board = p.load()
+            f.close()
+            return b
+        except:
+            return False
+
+    @staticmethod
+    def save(inst,path):
+        '''
+        For testing
+        '''
+        try:
+            import pickle
+            f = open(path, 'w')
+            p = pickle.Pickler(f)
+            p.dump(inst._board)
+            f.close()
+            return True
+        except:
+            return False
+    
+        
     def parseMove(self, player, move_tuples):
+        """
+        Player:  Player id
+        move_tuples:  A list of tuples with elements ordered as letter, row, column
+        ##############################################
+        
+        """
         # Define Orientation of Primary Move (Not ancillary words)
         orientation = True # True = horizontal, False = vertical
         try:
@@ -277,6 +274,8 @@ class Board:
         if not list(moves['Letter']) in player.rack:
             return False
         
+        ### How to Determine logic for blank tiles
+        
         # Confirm All moves in the same row OR the same column
         # Define the main index (row/col) which the primary words resides in
         if (len(moves.Row.unique()) == 1):
@@ -287,7 +286,10 @@ class Board:
             prim_index = moves.Column.unique()
         else:
             return False
-
+        
+#        for 
+        
+        words_played = []
         tiles_played = []
         attachments = []
             
@@ -352,7 +354,8 @@ class Scrabble:
         for p in itertools.cycle(self.play_order):
             while contin:
                 print p
-                inp = raw_input()
+#                inp = raw_input()
+                inp = "---"               
                 if inp == "---":
                     contin = False
                 elif inp == 'abc':
@@ -389,9 +392,4 @@ if __name__ == "__main__":
     print s.issuperset(test_move)
     
     print 'q' in b
-#    print timeit.timeit("'an' in locals()['WORDS']")
- #   print timeit.timeit("'an' in locals()['WORDS']")
-#  ___ ___ 
-# |   |   |
-# |___|___|
 
