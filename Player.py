@@ -1,6 +1,10 @@
+from Bag import *
+from Other import *
+import pdb
 
 class Player:
     def __init__(self, p_id, name, p_type):
+        pdb.set_trace()
         self.rack = Bag()
         self.name = name
         self.p_id = p_id

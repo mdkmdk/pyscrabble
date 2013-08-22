@@ -1,4 +1,7 @@
 from Consts import *
+from Other import *
+from Bag import *
+from Player import *
 
 class Board:
     BOARD_SIZE = 15

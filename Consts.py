@@ -2,17 +2,34 @@
 import re, os, sys, itertools, random
 import numpy as np
 import pdb
-from pandas import DataFrame, Series
+from pandas import DataFrame, Series, isnull, notnull
+from numpy import nan
 
 if os.getcwd() == 'N:\\Workspace\\krausm\\Python':
     os.chdir("h:\\scr\\")
 
+MAX_WORD_LEN = 15
+MAX_LEN=0 # Set Below
+
 # Setup words list
 sep = os.linesep
 with open('sowpods.txt') as f:
-    WORDS = [w.rstrip(sep) for w in f]
+    temp = [w.rstrip(sep) for w in f]
+    
+temp.reverse()
 
-WORDS = sorted(WORDS, key=lambda x: len(x))
+WORDS = {}
+for i in range(1,MAX_WORD_LEN+1):
+    WORDS[i] = set()
+
+while True:
+    try:
+        w = temp.pop()
+    except IndexError:
+        break
+    WORDS[len(w)].add(w)
+
+del temp
 
 # Tuples denote a) number of tiles and b)score
 TILE_DICT = {
@@ -49,5 +66,5 @@ OWNER = set(['BAG', 'BOARD']) # Append player ids once game initiates
 PLAYER_TYPE = set(['AI', 'HUMAN'])
 ##############################################################################
 ##############################################################################
-##############################################################################
+##############      UTILITY FUNCTIONS            #############################
 ##############################################################################
