@@ -4,6 +4,18 @@ import numpy as np
 import pdb
 from pandas import DataFrame, Series, isnull, notnull
 from numpy import nan
+import logging
+
+#global mylog
+#mylog = logging.Logger()
+#fh = logging.FileHandler('scrabble.log')
+#fh.setLevel(logging.DEBUG)
+#mylog.addHandler(fh)
+
+logging.basicConfig(filename='scrabble.log', level=logging.DEBUG, filemode='w')
+logging.debug('This message should go to the log file')
+logging.info('So should this')
+logging.warning('And this, too')
 
 if os.getcwd() == 'N:\\Workspace\\krausm\\Python':
     os.chdir("h:\\scr\\")
@@ -19,8 +31,6 @@ sep = os.linesep
 with open('sowpods.txt') as f:
     temp = [w.rstrip(sep) for w in f]
     
-temp.reverse()
-
 WORDS = {}
 for i in range(1,MAX_WORD_LEN+1):
     WORDS[i] = set()
@@ -346,8 +356,9 @@ class Board:
         self.board_df = self.board_df.append(moves_df)    
         return True
 
-    def __str__(self):      
-        ans = 15 * " ___" + "\n"
+    def __str__(self):  
+        ans = "\n"
+        ans += 15 * " ___" + "\n"
         for i in range(15):
             for j in range(15):
                 if (i,j) in self.board_df.index:
@@ -672,8 +683,9 @@ class Scrabble:
         
             
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+#    import doctest
+#    doctest.testmod()
+
     sc = Scrabble()
     bo = Board()
 #    bo._board[7][6].letter = 't'
@@ -708,16 +720,16 @@ if __name__ == "__main__":
 #    test_move2 = DataFrame({'Letter': list('meats')}, index = zip([5,6,7,8,6], [7,7,7,7,8]))
     print 'Test Parsing Moves'
     test_move = [('m',5,7),('e',6,7),('a',7,7),('t',8,7)]
-    print bo.parseMove(test_move)
-    print bo
+    logging.info(bo.parseMove(test_move))
+    logging.info(bo)
     test_move = [('t', 2, 8), ('r', 3, 8), ('e', 4, 8), ('e', 5, 8)] #, ('s', 6, 8)]
-    print bo.parseMove(test_move)
-    print bo
+    logging.info(bo.parseMove(test_move))
+    logging.info(bo)
     test_move = [('s',6,8), ('m', 6, 6), ('s', 6,9)]
-    print bo.parseMove(test_move)
-    print bo 
+    logging.info(bo.parseMove(test_move))
+    logging.info(bo)
     test_move = [('a', 4,6), ('i',5,6)]
-    print bo.parseMove(test_move)
-    print bo 
+    logging.info(bo.parseMove(test_move))
+    logging.info(bo)
     
     
