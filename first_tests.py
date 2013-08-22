@@ -10,6 +10,9 @@ if os.getcwd() == 'N:\\Workspace\\krausm\\Python':
 
 MAX_WORD_LEN = 15
 MAX_LEN=0 # Set Below
+OWNER = set(['BAG', 'BOARD']) # Append player ids once game initiates
+PLAYER_TYPE = set(['AI', 'HUMAN'])
+MULTIPLIERS = ['TRIP_WORD', 'DOUB_WORD', 'TRIP_LET', 'DOUB_LET']
 
 # Setup words list
 sep = os.linesep
@@ -62,8 +65,39 @@ TILE_DICT = {
     ' ': (2, 0)
     }
     
-OWNER = set(['BAG', 'BOARD']) # Append player ids once game initiates
-PLAYER_TYPE = set(['AI', 'HUMAN'])
+
+# 8 x trip_words
+# 17 x double_words
+# 12 x triple_let
+# 24 x double_lets
+
+MULT_DF = DataFrame()
+
+trip_words = [(a,b) for a in [0,8,14] for b in [0,8,14]]
+trip_words.remove((8,8))
+MULT_DF = MULT_DF.append( DataFrame([(a,b,'TRIP_WORD') for a,b in trip_words], columns=['Row','Column','Multiplier']) )
+
+double_words = [(a,a) for a in [1,2,3,4,10,11,12,13]]
+double_words.extend( [(a,b) for a,b in  zip([13, 12, 11, 10, 4, 3, 2, 1],[1,2,3,4,10,11,12,13])] )
+double_words.append((7,7))
+MULT_DF = MULT_DF.append( DataFrame([(a,b,'DOUB_WORD') for a,b in double_words], columns=['Row','Column','Multiplier']) , ignore_index=True)
+
+triple_let = [(a,b) for a in [5,9] for b in [1,13]]
+triple_let.extend( [(a,b) for a in [1,13] for b in [5,9]] )
+triple_let.extend( [(a,b) for a in [5,9] for b in [5,9]] )
+MULT_DF = MULT_DF.append( DataFrame([(a,b,'TRIP_LET') for a,b in triple_let], columns=['Row','Column','Multiplier']) , ignore_index=True)
+
+double_let = [(a,b) for a in [3,11] for b in [0,14]]
+double_let.extend( [(a,b) for a in [0,14] for b in [3,11]] )#
+double_let.extend( [(a,b) for a in [6,8] for b in [2, 12]] )
+double_let.extend( [(a,b) for a in [2, 12] for b in [6,8]] )#
+double_let.extend( [(7,2), (2,7), (11,7), (7,11)] )
+double_let.extend( [(a,b) for a in [6,8] for b in [6,8] ])#
+MULT_DF = MULT_DF.append( DataFrame([(a,b,'DOUB_LET') for a,b in double_let], columns=['Row','Column','Multiplier']) , ignore_index=True)    
+
+MULT_DF = MULT_DF.sort(['Row','Column'])
+MULT_DF.set_index(['Row','Column'], drop=False, inplace=True)
+del trip_words, double_words, triple_let, double_let
 
 ##############################################################################
 ##############################################################################
@@ -365,11 +399,22 @@ class Board:
         except:
             return Fals        
 
-    def parseMove(self, move_tuples, player=None):
+    def parseMove(self, move_tuples, player=None, tiles_bag=None):
         """
         Player:  Player id
         move_tuples:  A list of tuples with elements ordered as letter, row, column
         ##############################################
+        
+        -------------------------------------------
+        for doctest
+        >>> bo = Board() ; test_move = [('m',5,7),('e',6,7),('a',7,7),('t',8,7)] ; bo.parseMove(test_move) ; 
+        True
+        >>> test_move = [('t', 2, 8), ('r', 3, 8), ('e', 4, 8), ('e', 5, 8)] ; bo.parseMove(test_move)
+        True
+        >>> test_move = [('s',6,8), ('m', 6, 6), ('s', 6,9)] ; bo.parseMove(test_move)
+        True
+        >>> test_move = [('a', 4,6), ('i',5,6)]; bo.parseMove(test_move)
+        True
         
         """
         orientation = True # True = horizontal, False = vertical
@@ -414,19 +459,22 @@ class Board:
     
     def _parseWords(self, moves, orientation, prim_index):
         
+        require_anc_word = False # for words where only attachment point is via an ancillary word
+        found_anc_word = False # boolean indicating an ancillary word found
         temp_board = moves.append(self.board_df)
         
-        if orientation:
-            #Horizontal
+        if orientation: #Horizontal
             min_i, max_i = min(moves.Column), max(moves.Column)
-            if np.max(Series(moves.index.levels[1])) != 1:
-                # Letters not placed continuously, confirm letter between 
+            
+            # Letters not placed continuously, confirm letter between
+            if np.max(Series(moves.index.levels[1])) != 1: 
                 for i in range(min_i, max_i):
                     if (prim_index, i) not in temp_board.index:
                         return False
-                    
+
+            # Get Primary Word                    
             while True:
-                print min_i
+#                print min_i
                 if (prim_index, min_i-1) not in temp_board.index:
                     break
                 else:
@@ -441,16 +489,49 @@ class Board:
             for i in range (min_i, max_i+1):
                 if i<0: continue
                 prim_word += temp_board.ix[prim_index,i]['Letter']
-                
+            
+            # Check if an ancillary word is required for an attachment point and that the board is not empty
+            if (min_i == moves.Column.min()) and (max_i == moves.Column.max()) and (self.board_df.shape != (0,0)):
+                print 'Require Ancillary Word'
+                require_anc_word = True
+            
             print prim_word
             if prim_word not in WORDS[len(prim_word)]:
                 print '%s is not a word' % prim_word
                 return False
-                
             
+            # Get Ancillary Words
+            for cc in moves.Column:
+                min_i = max_i = prim_index
+                while True:
+                    if (min_i-1, cc) not in temp_board.index:
+                        break
+                    else:
+                        min_i -= 1
+                while True:
+                    if (max_i+1, cc) not in temp_board.index:
+                        break
+                    else:
+                        max_i+=1
+                        
+                if (min_i == max_i == prim_index): # No Ancillary Word Found
+                    continue
+                else: #ancillary word found
+                    found_anc_word = True
+                    anc_word = ""
+                    for i in range(min_i,max_i+1):
+                        anc_word += temp_board.ix[i, cc]['Letter']
+                        
+                    print "Ancillary Word is " , anc_word
+                    if anc_word not in WORDS[len(anc_word)]:
+                        print '%s is not a word' % anc_word
+                        return False
             
-        else:
-           #Vertical
+            if require_anc_word and not found_anc_word:
+                return False
+
+            
+        else: #Vertical
             min_i,max_i = min(moves.Row), max(moves.Row)
             if np.max(Series(moves.index.levels[0])) != 1:
                 # Letters not placed continuously, confirm letter between 
@@ -460,7 +541,7 @@ class Board:
                     
             # Find Primary Word
             while True:
-                print min_i
+#                print min_i
                 if (min_i-1, prim_index) not in temp_board.index:
                     break
                 else:
@@ -476,9 +557,44 @@ class Board:
                 if i<0: continue
                 prim_word += temp_board.ix[i, prim_index]['Letter']
                 
+            # Check if an ancillary word is required for an attachment point and that the board is not empty
+            if (min_i == moves.Row.min()) and (max_i == moves.Row.max()) and (self.board_df.shape != (0,0)):
+                print 'Require Ancillary Word'
+                require_anc_word = True
+                
             print prim_word
             if prim_word not in WORDS[len(prim_word)]:
                 print '%s is not a word' % prim_word
+                return False
+            
+            # Get Ancillary Words
+            for rr in moves.Row:
+                min_i = max_i = prim_index
+                while True:
+                    if (rr, min_i-1) not in temp_board.index:
+                        break
+                    else:
+                        min_i -= 1
+                while True:
+                    if (rr, max_i+1) not in temp_board.index:
+                        break
+                    else:
+                        max_i+=1
+                        
+                if (min_i == max_i == prim_index): # No Ancillary Word Found
+                    continue
+                else: #ancillary word found
+                    found_anc_word = True
+                    anc_word = ""
+                    for i in range(min_i,max_i+1):
+                        anc_word += temp_board.ix[rr,i]['Letter']
+                        
+                    print "Ancillary Word is " , anc_word
+                    if anc_word not in WORDS[len(anc_word)]:
+                        print '%s is not a word' % anc_word
+                        return False
+                        
+            if require_anc_word and not found_anc_word:
                 return False
             
         return True
@@ -556,7 +672,8 @@ class Scrabble:
         
             
 if __name__ == "__main__":
-
+    import doctest
+    doctest.testmod()
     sc = Scrabble()
     bo = Board()
 #    bo._board[7][6].letter = 't'
