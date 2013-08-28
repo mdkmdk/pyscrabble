@@ -1,0 +1,230 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module first_tests</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>first_tests</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///H:/git/pyscrabble/first_tests.py">h:\git\pyscrabble\first_tests.py</a></font></td></tr></table>
+    <p><tt>Created&nbsp;by&nbsp;Michael&nbsp;Kraus<br>
+Testing&nbsp;PYDOC&nbsp;Web&nbsp;Help</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="itertools.html">itertools</a><br>
+<a href="logging.html">logging</a><br>
+<a href="numpy.html">numpy</a><br>
+</td><td width="25%" valign=top><a href="os.html">os</a><br>
+<a href="pdb.html">pdb</a><br>
+<a href="pickle.html">pickle</a><br>
+</td><td width="25%" valign=top><a href="random.html">random</a><br>
+<a href="re.html">re</a><br>
+<a href="sys.html">sys</a><br>
+</td><td width="25%" valign=top></td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="first_tests.html#Bag">Bag</a>
+</font></dt><dt><font face="helvetica, arial"><a href="first_tests.html#Board">Board</a>
+</font></dt><dt><font face="helvetica, arial"><a href="first_tests.html#Player">Player</a>
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="first_tests.html#AIPlayer">AIPlayer</a>
+</font></dt></dl>
+</dd>
+<dt><font face="helvetica, arial"><a href="first_tests.html#Scrabble">Scrabble</a>
+</font></dt><dt><font face="helvetica, arial"><a href="first_tests.html#Tile">Tile</a>
+</font></dt></dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="AIPlayer">class <strong>AIPlayer</strong></a>(<a href="first_tests.html#Player">Player</a>)</font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods inherited from <a href="first_tests.html#Player">Player</a>:<br>
+<dl><dt><a name="AIPlayer-__init__"><strong>__init__</strong></a>(self, p_id, name, p_type)</dt></dl>
+
+<dl><dt><a name="AIPlayer-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="AIPlayer-printRack"><strong>printRack</strong></a>(self)</dt><dd><tt>Show's&nbsp;tile's&nbsp;in&nbsp;player's&nbsp;rack<br>
+&nbsp;<br>
+######&nbsp;Returns&nbsp;######&nbsp;<br>
+None<br>
+&nbsp;<br>
+######&nbsp;Usage&nbsp;######&nbsp;<br>
+No&nbsp;Direct&nbsp;Usage</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Bag">class <strong>Bag</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Bag-__contains__"><strong>__contains__</strong></a>(self, item)</dt></dl>
+
+<dl><dt><a name="Bag-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Bag-__iter__"><strong>__iter__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Bag-__len__"><strong>__len__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Bag-append"><strong>append</strong></a>(self, x)</dt></dl>
+
+<dl><dt><a name="Bag-exchange"><strong>exchange</strong></a>(self)</dt><dd><tt>#&nbsp;To&nbsp;Facilitate&nbsp;Exchanging&nbsp;Tiles</tt></dd></dl>
+
+<dl><dt><a name="Bag-getLetterList"><strong>getLetterList</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Bag-getLetterSet"><strong>getLetterSet</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Bag-getRandomTile"><strong>getRandomTile</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Bag-getTileSet"><strong>getTileSet</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Bag-pop"><strong>pop</strong></a>(self, t_id<font color="#909090">=None</font>, let<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Bag-remove"><strong>remove</strong></a>(self, tile)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Board">class <strong>Board</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Board-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Board-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Board-check_move"><strong>check_move</strong></a>(self, mve)</dt></dl>
+
+<dl><dt><a name="Board-parseMove"><strong>parseMove</strong></a>(self, move_tuples, player<font color="#909090">=None</font>, tiles_bag<font color="#909090">=None</font>)</dt><dd><tt>Check's&nbsp;that&nbsp;the&nbsp;player's&nbsp;move&nbsp;is&nbsp;valid&nbsp;with&nbsp;reference&nbsp;to&nbsp;the&nbsp;board.<br>
+This&nbsp;is&nbsp;part&nbsp;2&nbsp;of&nbsp;2&nbsp;of&nbsp;logic&nbsp;for&nbsp;checking&nbsp;validity&nbsp;of&nbsp;a&nbsp;player's&nbsp;move.&nbsp;<br>
+The&nbsp;other&nbsp;part&nbsp;checks&nbsp;aspects&nbsp;of&nbsp;move&nbsp;validity&nbsp;related&nbsp;to&nbsp;the&nbsp;player<br>
+itself&nbsp;(i.e.&nbsp;valid&nbsp;tiles&nbsp;played,&nbsp;not&nbsp;too&nbsp;many&nbsp;tiles&nbsp;played,&nbsp;exchanges,&nbsp;etc.)<br>
+&nbsp;<br>
+######&nbsp;Inputs&nbsp;######<br>
+<a href="#Player">Player</a>:&nbsp;&nbsp;<a href="#Player">Player</a>&nbsp;id<br>
+move_tuples:&nbsp;&nbsp;A&nbsp;list&nbsp;of&nbsp;tuples&nbsp;with&nbsp;elements&nbsp;ordered&nbsp;as&nbsp;letter,&nbsp;row,&nbsp;column<br>
+tiles_bag:&nbsp;&nbsp;????&nbsp;What&nbsp;was&nbsp;this&nbsp;supposed&nbsp;to&nbsp;be?<br>
+&nbsp;<br>
+######&nbsp;Returns&nbsp;######&nbsp;<br>
+True:&nbsp;Valid&nbsp;Move<br>
+False:&nbsp;Invalid&nbsp;Move<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+######&nbsp;Usage&nbsp;######&nbsp;<br>
+&gt;&gt;&gt;&nbsp;bo&nbsp;=&nbsp;<a href="#Board">Board</a>()&nbsp;;&nbsp;test_move&nbsp;=&nbsp;[('m',5,7),('e',6,7),('a',7,7),('t',8,7)]&nbsp;;&nbsp;bo.<a href="#Board-parseMove">parseMove</a>(test_move)&nbsp;;&nbsp;<br>
+True<br>
+&gt;&gt;&gt;&nbsp;test_move&nbsp;=&nbsp;[('t',&nbsp;2,&nbsp;8),&nbsp;('r',&nbsp;3,&nbsp;8),&nbsp;('e',&nbsp;4,&nbsp;8),&nbsp;('e',&nbsp;5,&nbsp;8)]&nbsp;;&nbsp;bo.<a href="#Board-parseMove">parseMove</a>(test_move)<br>
+True<br>
+&gt;&gt;&gt;&nbsp;test_move&nbsp;=&nbsp;[('s',6,8),&nbsp;('m',&nbsp;6,&nbsp;6),&nbsp;('s',&nbsp;6,9)]&nbsp;;&nbsp;bo.<a href="#Board-parseMove">parseMove</a>(test_move)<br>
+True<br>
+&gt;&gt;&gt;&nbsp;test_move&nbsp;=&nbsp;[('a',&nbsp;4,6),&nbsp;('i',5,6)];&nbsp;bo.<a href="#Board-parseMove">parseMove</a>(test_move)<br>
+True</tt></dd></dl>
+
+<hr>
+Static methods defined here:<br>
+<dl><dt><a name="Board-load"><strong>load</strong></a>(path)</dt><dd><tt>For&nbsp;testing</tt></dd></dl>
+
+<dl><dt><a name="Board-save"><strong>save</strong></a>(inst, path)</dt><dd><tt>For&nbsp;testing</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>BOARD_SIZE</strong> = 15</dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Player">class <strong>Player</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Player-__init__"><strong>__init__</strong></a>(self, p_id, name, p_type)</dt></dl>
+
+<dl><dt><a name="Player-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Player-printRack"><strong>printRack</strong></a>(self)</dt><dd><tt>Show's&nbsp;tile's&nbsp;in&nbsp;player's&nbsp;rack<br>
+&nbsp;<br>
+######&nbsp;Returns&nbsp;######&nbsp;<br>
+None<br>
+&nbsp;<br>
+######&nbsp;Usage&nbsp;######&nbsp;<br>
+No&nbsp;Direct&nbsp;Usage</tt></dd></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Scrabble">class <strong>Scrabble</strong></a></font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Primary&nbsp;Class&nbsp;to&nbsp;play&nbsp;a&nbsp;scrabble&nbsp;game.&nbsp;&nbsp;May&nbsp;play&nbsp;with&nbsp;2-4&nbsp;players.<br>
+Follows&nbsp;all&nbsp;the&nbsp;rules&nbsp;of&nbsp;the&nbsp;original&nbsp;game,&nbsp;with&nbsp;the&nbsp;exception&nbsp;of<br>
+removing&nbsp;challenges&nbsp;(possible&nbsp;future&nbsp;addition).<br>
+&nbsp;<br>
+######&nbsp;Usage&nbsp;######&nbsp;<br>
+&gt;&gt;&gt;&nbsp;sc&nbsp;=&nbsp;<a href="#Scrabble">Scrabble</a>()<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Scrabble-__init__"><strong>__init__</strong></a>(self)</dt></dl>
+
+</td></tr></table> <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Tile">class <strong>Tile</strong></a></font></td></tr>
+    
+<tr><td bgcolor="#ffc8d8"><tt>&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%">Methods defined here:<br>
+<dl><dt><a name="Tile-__add__"><strong>__add__</strong></a>(self, other)</dt></dl>
+
+<dl><dt><a name="Tile-__eq__"><strong>__eq__</strong></a>(self, other)</dt><dd><tt>#&nbsp;Compares&nbsp;t_id</tt></dd></dl>
+
+<dl><dt><a name="Tile-__hash__"><strong>__hash__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Tile-__init__"><strong>__init__</strong></a>(self, let, scr<font color="#909090">=None</font>, t_id<font color="#909090">=None</font>, owner<font color="#909090">=None</font>)</dt></dl>
+
+<dl><dt><a name="Tile-__str__"><strong>__str__</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="Tile-isLetter"><strong>isLetter</strong></a>(let)</dt></dl>
+
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>MAX_LEN</strong> = 0<br>
+<strong>MAX_WORD_LEN</strong> = 15<br>
+<strong>MULTIPLIERS</strong> = ['TRIP_WORD', 'DOUB_WORD', 'TRIP_LET', 'DOUB_LET']<br>
+<strong>MULT_DF</strong> =             Row  Column Multiplier
+Row Column   ... 11   DOUB_LET
+    14       14      14  TRIP_WORD<br>
+<strong>OWNER</strong> = set(['BAG', 'BOARD'])<br>
+<strong>PLAYER_TYPE</strong> = set(['AI', 'HUMAN'])<br>
+<strong>TILE_DICT</strong> = {' ': (2, 0), 'a': (9, 1), 'b': (2, 3), 'c': (2, 3), 'd': (4, 2), 'e': (12, 1), 'f': (2, 4), 'g': (3, 2), 'h': (2, 4), 'i': (9, 1), ...}<br>
+<strong>WORDS</strong> = {1: set([]), 2: set(['aa', 'ab', 'ad', 'ae', 'ag', 'ah', ...]), 3: set(['aah', 'aal', 'aas', 'aba', 'abb', 'abo', ...]), 4: set(['aahs', 'aals', 'abac', 'abas', 'abba', 'abbe', ...]), 5: set(['aahed', 'aalii', 'aargh', 'aarti', 'abaca', 'abaci', ...]), 6: set(['aahing', 'aaliis', 'aarrgh', 'aartis', 'abacas', 'abacus', ...]), 7: set(['aarrghh', 'abactor', 'abalone', 'abanded', 'abandon', 'abasers', ...]), 8: set(['aardvark', 'aardwolf', 'aasvogel', 'abactors', 'abacuses', 'abalones', ...]), 9: set(['aardvarks', 'aasvogels', 'abactinal', 'abamperes', 'abandoned', 'abandonee', ...]), 10: set(['aardwolves', 'abacterial', 'abandonees', 'abandoners', 'abandoning', 'abasements', ...]), ...}<br>
+<strong>a</strong> = 8<br>
+<strong>b</strong> = 8<br>
+<strong>l</strong> = 267751<br>
+<strong>nan</strong> = nan<br>
+<strong>pydoc_cmd</strong> = 'U:/python/apps/run_local.bat "C:/local_runtimes_64/19.10/Lib/pydoc.py" -w first_tests'<br>
+<strong>sep</strong> = '<font color="#c040c0">\r\n</font>'<br>
+<strong>w</strong> = set(['abiogenetically', 'aboriginalities', 'absorbabilities', 'absorbefacients', 'absorptiometers', 'abstractionisms', ...])</td></tr></table>
+</body></html>

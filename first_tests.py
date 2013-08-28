@@ -1,10 +1,16 @@
-
-import re, os, sys, itertools, random
+"""
+Created by Michael Kraus
+Testing PYDOC Web Help
+"""
+import re, os, sys, itertools, random, pickle
+from colorama import init, deinit, Fore, Back, Style # Colored terminal text
 import numpy as np
 import pdb
 from pandas import DataFrame, Series, isnull, notnull
 from numpy import nan
 import logging
+
+pydoc_cmd = r'U:/python/apps/run_local.bat "C:/local_runtimes_64/19.10/Lib/pydoc.py" -w first_tests'
 
 #global mylog
 #mylog = logging.Logger()
@@ -12,37 +18,69 @@ import logging
 #fh.setLevel(logging.DEBUG)
 #mylog.addHandler(fh)
 
-logging.basicConfig(filename='scrabble.log', level=logging.DEBUG, filemode='w')
-logging.debug('This message should go to the log file')
-logging.info('So should this')
-logging.warning('And this, too')
+#logging.basicConfig(filename='scrabble.log', level=logging.DEBUG, filemode='w')
+#logging.debug('This message should go to the log file')
+#logging.INFO('So should this')
+#logging.warning('And this, too')
 
 if os.getcwd() == 'N:\\Workspace\\krausm\\Python':
-    os.chdir("h:\\scr\\")
+    os.chdir("h:\\git\\pyscrabble\\")
 
+""" Maximum Word Length Allowed """
+COLOR_OUTPUT = True
 MAX_WORD_LEN = 15
 MAX_LEN=0 # Set Below
 OWNER = set(['BAG', 'BOARD']) # Append player ids once game initiates
 PLAYER_TYPE = set(['AI', 'HUMAN'])
-MULTIPLIERS = ['TRIP_WORD', 'DOUB_WORD', 'TRIP_LET', 'DOUB_LET']
+MULTIPLIERS = {'TRIP_WORD':'3W', 'DOUB_WORD':'2W', 'TRIP_LET':'3L', 'DOUB_LET':'2L'}
 
 # Setup words list
 sep = os.linesep
-with open('sowpods.txt') as f:
-    temp = [w.rstrip(sep) for w in f]
+
+try:
+    f = file('words.pickle','rb')
+    WORDS = pickle.load(f)
+except IOError:
+    with open('sowpods.txt') as f:
+        temp = [w.rstrip(sep) for w in f]
+    WORDS = {}
+    for i in range(1,MAX_WORD_LEN+1):
+        WORDS[i] = set()
     
-WORDS = {}
-for i in range(1,MAX_WORD_LEN+1):
-    WORDS[i] = set()
+    while True:
+        try:
+            w = temp.pop()
+        except IndexError:
+            break
+        WORDS[len(w)].add(w)
+    
+    del temp
+    f = file('words.pickle', 'wb')
+    pickle.dump(WORDS, f, protocol=2)
+else:
+    pass
+finally:
+    l = 0
+    for w in WORDS.itervalues(): l+= len(w)
+    f.close()
+    del f
+    print "Dictionary Successfully Loaded: %s Words" % l
 
-while True:
-    try:
-        w = temp.pop()
-    except IndexError:
-        break
-    WORDS[len(w)].add(w)
-
-del temp
+#with open('sowpods.txt') as f:
+#    temp = [w.rstrip(sep) for w in f]
+    
+#WORDS = {}
+#for i in range(1,MAX_WORD_LEN+1):
+#    WORDS[i] = set()
+#
+#while True:
+#    try:
+#        w = temp.pop()
+#    except IndexError:
+#        break
+#    WORDS[len(w)].add(w)
+#
+#del temp
 
 # Tuples denote a) number of tiles and b)score
 TILE_DICT = {
@@ -200,6 +238,14 @@ class Bag:
     def getLetterSet(self):
         return set(self.letters)
     
+    def getTileFromLetters(self,lst):
+        """
+        lst: a list of letters
+        
+        Returns a list of tiles if all letters in bag
+        """
+        pass
+    
     def getTileSet(self):
         return set(self.bag_tiles)
     
@@ -264,21 +310,53 @@ class Player:
         self.p_id = p_id
         self.p_type = p_type
 
-    def addTile(self, tile):
+    def _addTile(self, tile):
+        """
+        Adds tile to player's rack.
+        
+        ###### Returns ###### 
+        True: Valid Tile Insertion
+        False: Invalid Tile Insertion
+        
+        ###### Usage ###### 
+        No Direct Usage  
+        """
         if len(self.rack) < 7:
             self.rack.append(tile)
-            return
+            return True
         else:
-            return - 1
+            return False
 
     def printRack(self):
+        """
+        Show's tile's in player's rack
+        
+        ###### Returns ###### 
+        None
+        
+        ###### Usage ###### 
+        No Direct Usage  
+        """
         for t in self.rack:
             print t
 
     def __str__(self):
         return str(self.name)
     
-    def isValidMove(self, move_tuples):
+    def _isValidMove(self, move_tuples):
+        """
+        Check's that a player has the tiles in rack to make the requested play.
+        This is part 1 of 2 of logic for checking validity of a player's move. 
+        The other part checks aspects of move validity related to the board
+        itself (i.e. valid words formed, spaces occupied/exist, etc.)
+        
+        ###### Returns ###### 
+        True: Valid move
+        False: Invalid move
+        
+        ###### Usage ###### 
+        No Direct Usage        
+        """
         # ADD LOGIC FOR DEALING WITH BLANK TILES
         
         # Confirm tiles played are in the player's rack and that they are not used multiple times
@@ -297,43 +375,45 @@ class AIPlayer(Player):
     pass
 
 
-class Spot:
-    def __init__(self, r_, c_):
-        self.r = r_
-        self.c = c_
-        self.letter = " "
-        self.score = None
+#class Spot:
+#    def __init__(self, r_, c_):
+#        self.r = r_
+#        self.c = c_
+#        self.letter = " "
+#        self.score = None
+#
+#    def __str__(self):
+#        return str((self.letter, self.score))
+#    
+#    def insertLetter(self):
+#        pass
 
-    def __str__(self):
-        return str((self.letter, self.score))
-    
-    def insertLetter(self):
-        pass
-
-class Move:
-    def __init__(self, move_tuple):
-        # of format (letter, row, column)
-        pass
-
+#class Move:
+#    def __init__(self, move_tuple):
+#        # of format (letter, row, column)
+#        pass
 
     
 class Board:
     BOARD_SIZE = 15
     def __init__(self):
-        self._board = 15 * [[]]
-        for i in range(15):
-            self._board[i] = []
-            for j in range(15):
-                self._board[i].append(Spot(i, j))
-#               self._board[i].append(None)
-#        self.board_df = DataFrame([(a,b, None, np.nan) for a in range(0,15) for b in range(0,15)], columns=['Row','Column','Letter', 't_id'])
+#        self._board = 15 * [[]]
+#        for i in range(15):
+#            self._board[i] = []
+#            for j in range(15):
+#                self._board[i].append(Spot(i, j))
+##               self._board[i].append(None)
+##        self.board_df = DataFrame([(a,b, None, np.nan) for a in range(0,15) for b in range(0,15)], columns=['Row','Column','Letter', 't_id'])
+        self._board_bag = Bag()
         self.board_df = DataFrame()
         self.moves = {}
+        self._score_board = DataFrame()
+        self._move_num = 1
 
     def check_move(self, mve):
         pass
 
-    def _insert_move(self, moves_df, player=None, move_num=None):
+    def _insert_move(self, moves_df, scoreBoard=None, player=None):
         """
         moves_df:  a DataFrame with columns Letter, Column, and Row
         
@@ -348,28 +428,88 @@ class Board:
         else:
             moves_df['Player'] = player.p_id
         
-        if move_num is None:
-            moves_df['move_num'] = None
-        else:
-            moves_df['move_num'] = move_num
-                   
-        self.board_df = self.board_df.append(moves_df)    
+        moves_df['move_num'] = self._move_num
+        
+        # Remove - Place holder until points logic inserted here
+        moves_df['Points'] = Series([random.randint(0,15) for i in range(0,moves_df.shape[0])], index = moves_df.index)
+        
+        self._move_num += 1
+        self.board_df = self.board_df.append(moves_df)
+#        Use when support logic ready
+#        self._score_board = self._score_board.append()    
         return True
 
     def __str__(self):  
-        ans = "\n"
-        ans += 15 * " ___" + "\n"
+        ans = "    "
+        if COLOR_OUTPUT: ans += Fore.YELLOW
         for i in range(15):
-            for j in range(15):
-                if (i,j) in self.board_df.index:
-                    ans += "| %s " % self.board_df.ix[i,j]['Letter']
+            if i >= 10:
+                 ans += "  %s   " % i
+            else:
+                ans += "  %s    " % i
+        ans += "\n"
+        if COLOR_OUTPUT:
+            ans += Fore.YELLOW
+            ans += "   " + 15 * " ______" + "\n"
+            for i in range(15):
+                ans += "   " + 15 * "|      " + "|\n"
+                ans += "   "
+                for j in range(15):
+                    if (i,j) in self.board_df.index:
+#                        ans += ""
+                        ans += Fore.YELLOW +"|  " + Fore.RESET + Style.BRIGHT + "%s   " % self.board_df.ix[i,j]['Letter']
+                        ans += Fore.YELLOW + Style.NORMAL
+                    elif (i,j) in MULT_DF.index:
+                        ans += "|  %s  " % MULTIPLIERS[MULT_DF.ix[i,j]['Multiplier']]
+                    else:
+                        ans += "|      "
+                ans += "|\n"
+                if i >= 10:
+                    ans += "%s " % i
                 else:
-                    ans += "|   "
-            ans += "|\n"
-            ans += 15 * "|___" + "|\n"
-#        for i in range(15):
-            # ans+= "\n" + 15* "|   " + "|"
-            # ans+= "\n" + 15* "|___" + "|"
+                    ans += "%s  " % i
+                for j in range(15):
+                    if (i,j) in self.board_df.index:
+                        spot_num = self.board_df.ix[i,j]['Points']
+                        if spot_num >= 10:
+                            ans += "|    %s" % spot_num
+                        else:
+                            ans += "|     %s" % spot_num
+                    else:
+                        ans += "|      "
+                ans += "|\n"
+                ans += "   " + 15 * "|______" + "|\n"
+                ans += Fore.YELLOW
+            ans += Fore.RESET + Style.RESET_ALL
+        else:
+            ans += "   " + 15 * " ______" + "\n"
+            for i in range(15):
+                ans += "   " + 15 * "|      " + "|\n"
+                ans += "   "
+                for j in range(15):
+                    if (i,j) in self.board_df.index:
+                        ans += "|  %s   " % self.board_df.ix[i,j]['Letter']
+                    elif (i,j) in MULT_DF.index:
+                        ans += "|  %s  " % MULTIPLIERS[MULT_DF.ix[i,j]['Multiplier']]
+                    else:
+                        ans += "|      "
+                ans += "|\n"
+                if i >= 10:
+                    ans += "%s " % i
+                else:
+                    ans += "%s  " % i
+                for j in range(15):
+                    if (i,j) in self.board_df.index:
+                        spot_num = self.board_df.ix[i,j]['Points']
+                        if spot_num >= 10:
+                            ans += "|    %s" % spot_num
+                        else:
+                            ans += "|     %s" % spot_num
+                    else:
+                        ans += "|      "
+                ans += "|\n"
+                ans += "   " +  15 * "|______" + "|\n"
+                
         return ans
 
 #    def getSpotLetter(self, r_, c_):
@@ -410,14 +550,23 @@ class Board:
         except:
             return Fals        
 
-    def parseMove(self, move_tuples, player=None, tiles_bag=None):
+    def parseMove(self, move_tuples, player=None, tiles_bag=None, exchange=False):
         """
+        Check's that the player's move is valid with reference to the board.
+        This is part 2 of 2 of logic for checking validity of a player's move. 
+        The other part checks aspects of move validity related to the player
+        itself (i.e. valid tiles played, not too many tiles played, exchanges, etc.)
+        
+        ###### Inputs ######
         Player:  Player id
         move_tuples:  A list of tuples with elements ordered as letter, row, column
-        ##############################################
+        tiles_bag:  ???? What was this supposed to be?
         
-        -------------------------------------------
-        for doctest
+        ###### Returns ###### 
+        True: Valid Move
+        False: Invalid Move
+                
+        ###### Usage ###### 
         >>> bo = Board() ; test_move = [('m',5,7),('e',6,7),('a',7,7),('t',8,7)] ; bo.parseMove(test_move) ; 
         True
         >>> test_move = [('t', 2, 8), ('r', 3, 8), ('e', 4, 8), ('e', 5, 8)] ; bo.parseMove(test_move)
@@ -426,7 +575,6 @@ class Board:
         True
         >>> test_move = [('a', 4,6), ('i',5,6)]; bo.parseMove(test_move)
         True
-        
         """
         orientation = True # True = horizontal, False = vertical
         try:
@@ -469,7 +617,22 @@ class Board:
         return True
     
     def _parseWords(self, moves, orientation, prim_index):
+        """
+        Check's that the player's move is valid with reference to the board.
+        This is part 2 of 2 of logic for checking validity of a player's move. 
+        The other part checks aspects of move validity related to the player
+        itself (i.e. valid tiles played, not too many tiles played, exchanges, etc.)
         
+        ###### Inputs ######
+        moves: 
+        
+        ###### Returns ###### 
+        DataFrame:  Valid Move(s) with details for scoring
+        False: Invalid Move
+                
+        ###### Usage ###### 
+        No direct usage.  Only used by parseMove(.) as a helper function.
+        """
         require_anc_word = False # for words where only attachment point is via an ancillary word
         found_anc_word = False # boolean indicating an ancillary word found
         temp_board = moves.append(self.board_df)
@@ -611,13 +774,21 @@ class Board:
         return True
         
 class Scrabble:
+    """
+    Primary Class to play a scrabble game.  May play with 2-4 players.
+    Follows all the rules of the original game, with the exception of
+    removing challenges (possible future addition).
+    
+    ###### Usage ###### 
+    >>> sc = Scrabble()
+    
+    """
 #    self.players
     # def print_bag():
     #     try:
             
         
     def __init__(self):
-
         self.players = []
     # Select number of Players    
         # while True:
@@ -662,7 +833,7 @@ class Scrabble:
 #                print (i,j)
                 new_tile = self.bag.getRandomTile()
 #                print new_tile
-                self.players[i].addTile(new_tile)
+                self.players[i]._addTile(new_tile)
 
     # Play the Game
         contin = True
@@ -675,7 +846,7 @@ class Scrabble:
                     contin = False
                 elif inp == 'abc':
                     break
-                if p.isValidMove(inp):
+                if p._isValidMove(inp):
                     if self._board.parseMove(move_tuples=inp, player=p):
                         continue
             if inp == "---":
@@ -683,6 +854,7 @@ class Scrabble:
         
             
 if __name__ == "__main__":
+    init() # init colorama
 #    import doctest
 #    doctest.testmod()
 
@@ -720,16 +892,16 @@ if __name__ == "__main__":
 #    test_move2 = DataFrame({'Letter': list('meats')}, index = zip([5,6,7,8,6], [7,7,7,7,8]))
     print 'Test Parsing Moves'
     test_move = [('m',5,7),('e',6,7),('a',7,7),('t',8,7)]
-    logging.info(bo.parseMove(test_move))
-    logging.info(bo)
+    print(bo.parseMove(test_move))
+    print(bo)
     test_move = [('t', 2, 8), ('r', 3, 8), ('e', 4, 8), ('e', 5, 8)] #, ('s', 6, 8)]
-    logging.info(bo.parseMove(test_move))
-    logging.info(bo)
+    print(bo.parseMove(test_move))
+    print(bo)
     test_move = [('s',6,8), ('m', 6, 6), ('s', 6,9)]
-    logging.info(bo.parseMove(test_move))
-    logging.info(bo)
+    print(bo.parseMove(test_move))
+    print(bo)
     test_move = [('a', 4,6), ('i',5,6)]
-    logging.info(bo.parseMove(test_move))
-    logging.info(bo)
+    print(bo.parseMove(test_move))
+    print(bo)
     
-    
+    deinit() # disable colorama
