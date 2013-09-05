@@ -1,4 +1,16 @@
+import win32com.client
+import win32com.client as win32
 
+class excelSafe(object):
+    def __init__(self, f):
+        self._f = f
+
+    def __call__(self, *args, **kwargs):
+        try:
+            return self._f(*args, **kwargs)
+        except:
+            self._f.excel.Quit()
+            return None
 
 class CountCalls(object):
     """
@@ -38,6 +50,84 @@ def f():
     
 @CountCalls
 def g():
+    return
+
+class attributeAccess(object):
+    def __init__(self,f):
+        self._f = f
+    def __call__(self, *args,**kwargs):
+        self._f(*args, **kwargs)
+        print self._f.test_word
+        
+class safeExcel(object):
+    def __init__(self, f):
+        self._f = f
+    def __call__(self,*args,**kwargs):
+        global excel
+        global wb
+        try:
+            print self._f.__name__
+            return self._f(*args,**kwargs)
+    #    except com_error:
+    #        print "com_error experienced"
+    #        wb.Save()
+    #        wb.Close()
+    #        excel.Quit()
+    #        del excel
+    #        return
+        except AttributeError:
+            print "AttributeError experienced"
+            wb.Save()
+            wb.Close()
+            excel.Quit()
+            del excel
+            return 'test'
+        except TypeError:
+            print "TYPE ERROR DAMMIT!"
+            return None
+        return 'test'
+
+#def safeExcel(func):
+#    global excel,wb
+#    try:
+#        print func.__name__
+#        return func()
+##    except com_error:
+##        print "com_error experienced"
+##        wb.Save()
+##        wb.Close()
+##        excel.Quit()
+##        del excel
+##        return
+#    except AttributeError:
+#        print "AttributeError experienced"
+#        wb.Save()
+#        wb.Close()
+#        excel.Quit()
+#        del excel
+#        return 'test'
+#    except TypeError:
+#        print "TYPE ERROR DAMMIT!"
+#        return None
+#    return 'test'
+
+@safeExcel
+def excel_test():
+    excel = win32.DispatchEx("Excel.Application")
+    excel.Visible = False
+    excel.DisplayAlerts = False
+    raise AttributeError
+    wb = excel.Workbooks.Add()
+    wb.SaveAs(Filename = "test.xlsx")
+    wb.Close()
+    excel.Quit()
+    return "taco"
+
+
+@attributeAccess
+def h():
+#    global test_word
+    test_word = 'Can a decorator print this object?'
     return
 
 if __name__ == "__main__":
