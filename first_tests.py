@@ -120,21 +120,27 @@ TILE_DICT = {
 # 12 x triple_let
 # 24 x double_lets
 
-MULT_DF = DataFrame()
+#MULT_DF = DataFrame()
+MULT_LET = {}
+MULT_WORD = {}
+
 
 trip_words = [(a,b) for a in [0,8,14] for b in [0,8,14]]
 trip_words.remove((8,8))
-MULT_DF = MULT_DF.append( DataFrame([(a,b,'TRIP_WORD') for a,b in trip_words], columns=['Row','Column','Multiplier']) )
+#MULT_DF = MULT_DF.append( DataFrame([(a,b,'TRIP_WORD') for a,b in trip_words], columns=['Row','Column','Multiplier']) )
+for a in trip_words: MULT_WORD[a] = 'TRIP_WORD'
 
 double_words = [(a,a) for a in [1,2,3,4,10,11,12,13]]
 double_words.extend( [(a,b) for a,b in  zip([13, 12, 11, 10, 4, 3, 2, 1],[1,2,3,4,10,11,12,13])] )
 double_words.append((7,7))
-MULT_DF = MULT_DF.append( DataFrame([(a,b,'DOUB_WORD') for a,b in double_words], columns=['Row','Column','Multiplier']) , ignore_index=True)
+#MULT_DF = MULT_DF.append( DataFrame([(a,b,'DOUB_WORD') for a,b in double_words], columns=['Row','Column','Multiplier']) , ignore_index=True)
+for a in double_words: MULT_WORD[a] = 'DOUB_WORD'
 
 triple_let = [(a,b) for a in [5,9] for b in [1,13]]
 triple_let.extend( [(a,b) for a in [1,13] for b in [5,9]] )
 triple_let.extend( [(a,b) for a in [5,9] for b in [5,9]] )
-MULT_DF = MULT_DF.append( DataFrame([(a,b,'TRIP_LET') for a,b in triple_let], columns=['Row','Column','Multiplier']) , ignore_index=True)
+#MULT_DF = MULT_DF.append( DataFrame([(a,b,'TRIP_LET') for a,b in triple_let], columns=['Row','Column','Multiplier']) , ignore_index=True)
+for a in triple_let: MULT_LET[a] = 'TRIP_LET'
 
 double_let = [(a,b) for a in [3,11] for b in [0,14]]
 double_let.extend( [(a,b) for a in [0,14] for b in [3,11]] )#
@@ -142,10 +148,11 @@ double_let.extend( [(a,b) for a in [6,8] for b in [2, 12]] )
 double_let.extend( [(a,b) for a in [2, 12] for b in [6,8]] )#
 double_let.extend( [(7,2), (2,7), (11,7), (7,11)] )
 double_let.extend( [(a,b) for a in [6,8] for b in [6,8] ])#
-MULT_DF = MULT_DF.append( DataFrame([(a,b,'DOUB_LET') for a,b in double_let], columns=['Row','Column','Multiplier']) , ignore_index=True)    
+#MULT_DF = MULT_DF.append( DataFrame([(a,b,'DOUB_LET') for a,b in double_let], columns=['Row','Column','Multiplier']) , ignore_index=True)    
+for a in double_let: MULT_LET[a] = 'DOUB_LET'
 
-MULT_DF = MULT_DF.sort(['Row','Column'])
-MULT_DF.set_index(['Row','Column'], drop=False, inplace=True)
+#MULT_DF = MULT_DF.sort(['Row','Column'])
+#MULT_DF.set_index(['Row','Column'], drop=False, inplace=True)
 del trip_words, double_words, triple_let, double_let
 
 ##############################################################################
@@ -208,30 +215,57 @@ class Bag:
             return True
         return False
 
-    def remove(self, tile):
-        try:
-            self.bag_tiles.remove(tile)
-        except ValueError:
-            return False
-        else:
-            self._populateLetters()
-            return True
-
-    def pop(self, t_id=None, let=None):
-        if t_id is not None:
+    def remove(self, val):
+        tle = None
+#        pdb.set_trace()
+        if isinstance(val, int):
+            # remove by t_id
             for t in self.bag_tiles:
-                if t_id == t.t_id:
-                    self.remove(t)
-                    return t
+                if val == t.t_id:
+                    tle = t
+                    break
+#                    self.remove(t)
+#                    return t
             return None
-        elif let is not None:
+        if isinstance(val,str):
+            # remove by letter
             for t in self.bag_tiles:
-                if t.letter == let:
-                    self.remove(t)
-                    return t
+                if val == t.letter:
+                    tle = t
+                    break
+#                    self.remove(t)
+#                    return t
             return None 
-        else:
-            return None
+        
+        if isinstance(val, Tile):
+            tle = val
+            
+        if tle is not None:
+            # remove by tile instance
+            try:
+                self.bag_tiles.remove(tle)
+            except ValueError:
+                return False
+            else:
+                self._populateLetters()
+                return True
+
+        
+#    def pop(self, t_id=None, let=None):
+#        if t_id is not None:
+#            for t in self.bag_tiles:
+#                if t_id == t.t_id:
+#                    self.remove(t)
+#                    return t
+#            return None
+#        elif let is not None:
+#            for t in self.bag_tiles:
+#                if t.letter == let:
+#                    self.remove(t)
+#                    return t
+#            return None 
+#        else:
+#            return None
 
     def getRandomTile(self):
         rem_tile = random.randint(0, len(self.bag_tiles)-1)
@@ -257,7 +291,8 @@ class Bag:
 
         ret_lst = []
         for l in lst:
-            ret_lst.append( self.pop(let = l) )
+#            ret_lst.append( self.pop(let = l) )
+            ret_lst.append( self.remove(l) )
 
         if None in ret_lst:
             for tle in ret_lst:
@@ -485,8 +520,10 @@ class Board:
 #                        ans += ""
                         ans += Fore.YELLOW +"|  " + Fore.RESET + Style.BRIGHT + "%s   " % self.board_df.ix[i,j]['Letter']
                         ans += Fore.YELLOW + Style.NORMAL
-                    elif (i,j) in MULT_DF.index:
-                        ans += "|  %s  " % MULTIPLIERS[MULT_DF.ix[i,j]['Multiplier']]
+                    elif (i,j) in MULT_WORD:
+                        ans += "|  %s  " % MULTIPLIERS[MULT_WORD[(i,j)]]
+                    elif (i,j) in MULT_LET:
+                        ans += "|  %s  " % MULTIPLIERS[MULT_LET[(i,j)]]
                     else:
                         ans += "|      "
                 ans += "|\n"
@@ -515,8 +552,10 @@ class Board:
                 for j in range(15):
                     if (i,j) in self.board_df.index:
                         ans += "|  %s   " % self.board_df.ix[i,j]['Letter']
-                    elif (i,j) in MULT_DF.index:
-                        ans += "|  %s  " % MULTIPLIERS[MULT_DF.ix[i,j]['Multiplier']]
+                    elif (i,j) in MULT_WORD:
+                        ans += "|  %s  " % MULTIPLIERS[MULT_WORD[(i,j)]]
+                    elif (i,j) in MULT_LET:
+                        ans += "|  %s  " % MULTIPLIERS[MULT_LET[(i,j)]]
                     else:
                         ans += "|      "
                 ans += "|\n"
