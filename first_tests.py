@@ -999,6 +999,7 @@ class Scrabble:
         contin = True
         for p in itertools.cycle(self.play_order):
             while contin:
+                assert self._confirmNumTiles() == 100
                 print p
 #                inp = raw_input()
                 inp = "---"               
@@ -1023,6 +1024,16 @@ class Scrabble:
                         
             if inp == "---":
                 break
+        
+#     @classmethod
+    def _confirmNumTiles(self):
+        sum = 0    
+        for p in self.players:
+            sum += len(p.rack)
+        sum += len(self._board._board_bag)
+        sum += len(self.bag)
+        return sum
+            
         
             
 if __name__ == "__main__":
