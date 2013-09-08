@@ -125,8 +125,8 @@ MULT_LET = {}
 MULT_WORD = {}
 
 
-trip_words = [(a,b) for a in [0,8,14] for b in [0,8,14]]
-trip_words.remove((8,8))
+trip_words = [(a,b) for a in [0,7,14] for b in [0,7,14]]
+trip_words.remove((7,7))
 #MULT_DF = MULT_DF.append( DataFrame([(a,b,'TRIP_WORD') for a,b in trip_words], columns=['Row','Column','Multiplier']) )
 for a in trip_words: MULT_WORD[a] = 'TRIP_WORD'
 
@@ -146,7 +146,7 @@ double_let = [(a,b) for a in [3,11] for b in [0,14]]
 double_let.extend( [(a,b) for a in [0,14] for b in [3,11]] )#
 double_let.extend( [(a,b) for a in [6,8] for b in [2, 12]] )
 double_let.extend( [(a,b) for a in [2, 12] for b in [6,8]] )#
-double_let.extend( [(7,2), (2,7), (11,7), (7,11)] )
+double_let.extend( [(7,3), (3,7), (11,7), (7,11)] )
 double_let.extend( [(a,b) for a in [6,8] for b in [6,8] ])#
 #MULT_DF = MULT_DF.append( DataFrame([(a,b,'DOUB_LET') for a,b in double_let], columns=['Row','Column','Multiplier']) , ignore_index=True)    
 for a in double_let: MULT_LET[a] = 'DOUB_LET'
@@ -474,32 +474,6 @@ class Board:
     def check_move(self, mve):
         pass
 
-    def _insert_move(self, moves_df, scoreBoard=None, player=None, tile_bag=None):
-        """
-        moves_df:  a DataFrame with columns Letter, Column, and Row
-        
-        ##############################################################
-        Receives a move as a dataframe, appends this to current board_df.
-        Appends move to 'moves' dict.
-        updates _board nested lists 
-        
-        """
-        if player is None:
-            moves_df['Player'] = None
-        else:
-            moves_df['Player'] = player.p_id
-        
-        moves_df['move_num'] = self._move_num
-        
-        # Remove - Place holder until points logic inserted here
-        moves_df['Points'] = Series([random.randint(0,15) for i in range(0,moves_df.shape[0])], index = moves_df.index)
-        
-        self._move_num += 1
-        self.board_df = self.board_df.append(moves_df)
-#        Use when support logic ready
-#        self._score_board = self._score_board.append()    
-        return True
-
     def __str__(self):  
         ans = "    "
         if COLOR_OUTPUT: ans += Fore.YELLOW
@@ -615,7 +589,7 @@ class Board:
         except:
             return False        
 
-    def parseMove(self, move_tuples, tiles = None, player=None, tiles_bag=None, exchange=False):
+    def parseMove(self, move_tuples,  player=None, exchange=False):
         """
         Check's that the player's move is valid with reference to the board.
         This is part 2 of 2 of logic for checking validity of a player's move. 
@@ -625,7 +599,7 @@ class Board:
         ###### Inputs ######
         Player:  Player id
         move_tuples:  A list of tuples with elements ordered as letter, row, column
-        tiles_bag:  ???? What was this supposed to be?
+        tile_bag:  ???? What was this supposed to be?
         
         ###### Returns ###### 
         True: Valid Move
@@ -641,11 +615,26 @@ class Board:
         >>> test_move = [('a', 4,6), ('i',5,6)]; bo.parseMove(test_move)
         True
         """
+        print self.parseMove.__name__
+        # Check validity of move from player's perspective
+#         pdb.set_trace()
+        if player is not None:
+            tile_bag = player._isValidMove(move_tuples)
+        else:
+            tile_bag = None
+            
+        # Invalid move from player's perspective
+        if tile_bag is False:
+            print "Tiles not in player's bag"
+            return False
+        
         orientation = True # True = horizontal, False = vertical
         try:
-            moves = DataFrame(move_tuples, columns=['Letter', 'Row', 'Column'])
-            moves.set_index(['Row','Column'], inplace=True, drop=False)
+            moves_df = DataFrame(move_tuples, columns=['Letter', 'Row', 'Column'])
+            moves_df.set_index(['Row','Column'], inplace=True, drop=False)
+            moves_df['Points'] = [TILE_DICT[let][1] for let in moves_df['Letter']]
         except:
+            print "Spots are occupied"
             return False
         
         ### How to Determine logic for blank tiles
@@ -653,31 +642,36 @@ class Board:
         # Define Orientation of Primary Move (Not ancillary words)
         # Confirm All moves in the same row OR the same column
         # Define the main index (row/col) which the primary words resides in
-        if (len(moves.Row.unique()) == 1):
+        if (len(moves_df.Row.unique()) == 1):
             orientation = True
-            prim_index = moves.Row.unique()[0]
-            moves = moves.sort('Column')
-        elif (len(moves.Column.unique()) == 1):
+            prim_index = moves_df.Row.unique()[0]
+            moves_df = moves_df.sort('Column')
+        elif (len(moves_df.Column.unique()) == 1):
             orientation = False
-            prim_index = moves.Column.unique()[0]
-            moves = moves.sort('Row')
+            prim_index = moves_df.Column.unique()[0]
+            moves_df = moves_df.sort('Row')
         else:
+            print "Invalid tile placements"
             return False
                     
         # Confirm tiles only placed in vacant spots
         try:
-            self.board_df.append(moves)
+            self.board_df.append(moves_df)
         except:
             return False
         
-        if not self._parseWords(moves, orientation, prim_index):
-            return False
-            
         # Confirm all words created are valid words
-        self._insert_move(moves)
-        return True
+        if not self._parseWords(moves_df, orientation, prim_index, tile_bag, player, exchange):
+            if player is not None:
+                player.addBag(tile_bag)
+            return False
+        else:
+            return True
+            
+#         self._insert_move(moves_df)
+#         return True
     
-    def _parseWords(self, moves, orientation, prim_index):
+    def _parseWords(self, moves_df, orientation, prim_index, tile_bag, player, exchange):
         """
         Check's that the player's move is valid with reference to the board.
         This is part 2 of 2 of logic for checking validity of a player's move. 
@@ -685,7 +679,7 @@ class Board:
         itself (i.e. valid tiles played, not too many tiles played, exchanges, etc.)
         
         ###### Inputs ######
-        moves:  a DataFrame with columns=['Letter', 'Row', 'Column']
+        moves_df:  a DataFrame with columns=['Letter', 'Row', 'Column']
         
         ###### Returns ###### 
         DataFrame:  Valid Move(s) with details for scoring
@@ -694,19 +688,20 @@ class Board:
         ###### Usage ###### 
         No direct usage.  Only used by parseMove(.) as a helper function.
         """
+#         print self._parseWords.__name__
         require_anc_word = False # for words where only attachment point is via an ancillary word
         found_anc_word = False # boolean indicating an ancillary word found
-        temp_board = moves.append(self.board_df)
+        temp_board = moves_df.append(self.board_df)
         words_df = DataFrame(columns = ['Row','Column','Letter','WordID', 'Point', 'placed'])
-        temp_words_df = DataFrame(columns = ['Row','Column','Letter','WordID', 'Point', 'placed'])
+        temp_words_df = DataFrame(columns = ['Row','Column','Letter','WordID', 'LetterPoint', 'ScorePoint', 'placed'])
         
 #        placed = True # requires to be global name?  Something not connecting????
         
         if orientation: #Horizontal
-            min_i, max_i = min(moves.Column), max(moves.Column)
+            min_i, max_i = min(moves_df.Column), max(moves_df.Column)
             
             # Letters not placed continuously, confirm letter between
-            if np.max(Series(moves.index.levels[1])) != 1: 
+            if np.max(Series(moves_df.index.levels[1])) != 1: 
                 for i in range(min_i, max_i):
                     if (prim_index, i) not in temp_board.index:
                         return False
@@ -729,14 +724,14 @@ class Board:
                 if i<0: continue
                 let_played = temp_board.ix[prim_index,i]['Letter']
                 prim_word += let_played
-                if (prim_index,i) in moves.index:
+                if (prim_index,i) in moves_df.index:
                     placed = True
                 else:
                     placed = False
-                temp_words_df = temp_words_df.append( Series( [prim_index, i, let_played, None, TILE_DICT[let_played][1], placed ], index =  ['Row','Column','Letter','WordID', 'Point', 'placed']), ignore_index=True)
+                temp_words_df = temp_words_df.append( Series( [prim_index, i, let_played, None, TILE_DICT[let_played][1], TILE_DICT[let_played][1], placed ], index =  ['Row','Column','Letter','WordID', 'LetterPoint', 'ScorePoint', 'placed']), ignore_index=True)
             
             # Check if an ancillary word is required for an attachment point and that the board is not empty
-            if (min_i == moves.Column.min()) and (max_i == moves.Column.max()) and (self.board_df.shape != (0,0)):
+            if (min_i == moves_df.Column.min()) and (max_i == moves_df.Column.max()) and (self.board_df.shape != (0,0)):
                 print 'Require Ancillary Word'
                 require_anc_word = True
             
@@ -749,8 +744,8 @@ class Board:
                 words_df = words_df.append(temp_words_df, ignore_index=True)
             
             # Get Ancillary Words
-            for cc in moves.Column:
-                temp_words_df = DataFrame(columns = ['Row','Column','Letter','WordID', 'Point', 'placed'])
+            for cc in moves_df.Column:
+                temp_words_df = DataFrame(columns = ['Row','Column','Letter','WordID', 'LetterPoint', 'ScorePoint', 'placed'])
                 min_i = max_i = prim_index
                 while True:
                     if (min_i-1, cc) not in temp_board.index:
@@ -770,12 +765,12 @@ class Board:
                     anc_word = ""
                     for i in range(min_i,max_i+1):
                         let_played = temp_board.ix[i, cc]['Letter']
-                        anc_word += temp_board.ix[i, cc]['Letter']
-                        if (i,cc) in moves.index:
+                        anc_word += let_played
+                        if (i,cc) in moves_df.index:
                             placed = True
                         else:       
-                            placed = False
-                        temp_words_df = temp_words_df.append( Series( [i, cc, let_played, None, TILE_DICT[let_played][1], placed ], index =  ['Row','Column','Letter','WordID', 'Point', 'placed']), ignore_index=True)
+                            placed = False    
+                        temp_words_df = temp_words_df.append( Series( [i, cc, let_played, None, TILE_DICT[let_played][1], TILE_DICT[let_played][1], placed ], index =  ['Row','Column','Letter','WordID', 'LetterPoint', 'ScorePoint', 'placed']), ignore_index=True)
                         
                     print "Ancillary Word is " , anc_word
                     if anc_word not in WORDS[len(anc_word)]:
@@ -790,10 +785,10 @@ class Board:
 
             
         else: #Vertical
-            min_i,max_i = min(moves.Row), max(moves.Row)
-            if np.max(Series(moves.index.levels[0])) != 1:
+            min_i,max_i = min(moves_df.Row), max(moves_df.Row)
+            if np.max(Series(moves_df.index.levels[0])) != 1:
                 # Letters not placed continuously, confirm letter between 
-                for i in range(min(moves.Row), max(moves.Row)):
+                for i in range(min(moves_df.Row), max(moves_df.Row)):
                     if (i,prim_index) not in temp_board.index:
                         return False
                     
@@ -811,12 +806,18 @@ class Board:
                     max_i += 1
             
             prim_word = ""
-            for i in range (min_i, max_i+1):
-                if i<0: continue
-                prim_word += temp_board.ix[i, prim_index]['Letter']
-                
+            for i in range (min_i, max_i + 1):
+                if i < 0: continue
+                let_played = temp_board.ix[i, prim_index]['Letter']
+                prim_word += let_played
+                if (i, prim_index) in moves_df.index:
+                    placed = True
+                else:
+                    placed = False
+                temp_words_df = temp_words_df.append(Series([i, prim_index, let_played, None, TILE_DICT[let_played][1], TILE_DICT[let_played][1], placed ], index=['Row', 'Column', 'Letter', 'WordID', 'LetterPoint', 'ScorePoint', 'placed']), ignore_index=True)
+            
             # Check if an ancillary word is required for an attachment point and that the board is not empty
-            if (min_i == moves.Row.min()) and (max_i == moves.Row.max()) and (self.board_df.shape != (0,0)):
+            if (min_i == moves_df.Row.min()) and (max_i == moves_df.Row.max()) and (self.board_df.shape != (0,0)):
                 print 'Require Ancillary Word'
                 require_anc_word = True
                 
@@ -824,9 +825,13 @@ class Board:
             if prim_word not in WORDS[len(prim_word)]:
                 print '%s is not a word' % prim_word
                 return False
-            
+            else:
+                temp_words_df['WordID'] = prim_word
+                words_df = words_df.append(temp_words_df, ignore_index=True)
+                
             # Get Ancillary Words
-            for rr in moves.Row:
+            for rr in moves_df.Row:
+                temp_words_df = DataFrame(columns = ['Row','Column','Letter','WordID', 'LetterPoint', 'ScorePoint', 'placed'])
                 min_i = max_i = prim_index
                 while True:
                     if (rr, min_i-1) not in temp_board.index:
@@ -845,24 +850,88 @@ class Board:
                     found_anc_word = True
                     anc_word = ""
                     for i in range(min_i,max_i+1):
-                        anc_word += temp_board.ix[rr,i]['Letter']
+                        let_played = temp_board.ix[rr,i]['Letter']
+                        anc_word += let_played
+                        if (rr, i) in moves_df.index:
+                            placed = True
+                        else:
+                            placed = False
+                        temp_words_df = temp_words_df.append( Series( [rr, i, let_played, None, TILE_DICT[let_played][1],  TILE_DICT[let_played][1], placed ], index =  ['Row','Column','Letter','WordID', 'LetterPoint', 'ScorePoint', 'placed']), ignore_index=True)    
                         
                     print "Ancillary Word is " , anc_word
                     if anc_word not in WORDS[len(anc_word)]:
                         print '%s is not a word' % anc_word
                         return False
+                    else:
+                        temp_words_df['WordID'] = anc_word
+                        words_df = words_df.append(temp_words_df, ignore_index=True)
                         
             if require_anc_word and not found_anc_word:
                 return False
 
         # Return a score value, itself returned as return of calcScore function
         words_df.set_index(['Row','Column','WordID'], inplace=True, drop=False) # results in duplicate keys
-        print words_df
+#         if self._words_df.shape == (0,0):
+#             self._words_df = words_df.copy()
+#         else:
+#             self._words_df = self._words_df.append(words_df)
+#         print words_df
+#         
+#         print "\n\n"
+#         
+#         print self._words_df
+        if not self._calcScore( moves_df, words_df, player, tile_bag):
+            return False
+        else:
+            return True
+
+    def _calcScore(self, moves_df, words_df, player, tile_bag):
+        """
+        Manipulates "ScorePoints" column of words_df and passes everything to self._insert_move
+        """
+        
+        if not self._insert_move(moves_df, words_df, player, tile_bag):
+            return False
+        else: 
+            return True
+    
+    def _insert_move(self, moves_df, words_df,  player=None, tile_bag=None):
+        """
+        moves_df:  a DataFrame with columns Letter, Column, and Row
+        
+        ##############################################################
+        Receives a move as a dataframe, appends this to current board_df.
+        Appends move to 'moves' dict.
+        updates _board nested lists 
+        
+        """
+#         print self._insert_move.__name__
+        if player is None:
+            moves_df['Player'] = None
+        else:
+            moves_df['Player'] = player.p_id
+        
+        moves_df['move_num'] = self._move_num
+        
+        if self._words_df.shape == (0,0):
+            self._words_df = words_df.copy()
+        else:
+            self._words_df = self._words_df.append(words_df)
+            
+        # Remove - Place holder until points logic inserted here
+#         moves_df['Points'] = Series([random.randint(0,15) for i in range(0,moves_df.shape[0])], index = moves_df.index)
+        
+        if self.board_df.shape != (0,0):
+            self.board_df = self.board_df.append(moves_df)
+        else:
+            self.board_df = moves_df.copy()
+        self._move_num += 1
+        
+        self._board_bag.append( tile_bag )
+#        Use when support logic ready
+#        self._score_board = self._score_board.append()    
         return True
 
-    def _calcScore(self, mve_df):
-        pass
-    
         
 class Scrabble:
     """
@@ -994,6 +1063,7 @@ if __name__ == "__main__":
 #    test_move = DataFrame({'Letter': list('meat')}, index=zip([5,6,7,8],[7,7,7,7]))
 #    test_move2 = DataFrame({'Letter': list('meats')}, index = zip([5,6,7,8,6], [7,7,7,7,8]))
     print 'Test Parsing Moves'
+    print(bo)
     test_move = [('m',5,7),('e',6,7),('a',7,7),('t',8,7)]
     print(bo.parseMove(test_move))
     print(bo)
