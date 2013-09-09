@@ -355,7 +355,8 @@ class Bag:
         return len(self.bag_tiles)
      
     def __iter__(self):
-         pass
+         for t in self.bag_tiles:
+             yield t
 
 
 class Player:
@@ -617,7 +618,7 @@ class Board:
         """
         print self.parseMove.__name__
         # Check validity of move from player's perspective
-#         pdb.set_trace()
+        pdb.set_trace()
         if player is not None:
             tile_bag = player._isValidMove(move_tuples)
         else:
@@ -912,6 +913,7 @@ class Board:
             moves_df['Player'] = player.p_id
         
         moves_df['move_num'] = self._move_num
+        words_df['move_num'] = self._move_num
         
         if self._words_df.shape == (0,0):
             self._words_df = words_df.copy()
@@ -996,34 +998,52 @@ class Scrabble:
                 self.players[i]._addTile(new_tile)
 
     # Play the Game
-        contin = True
         for p in itertools.cycle(self.play_order):
+            print self._board
+            print p.rack
+            print "\n\n"
+            
+            contin = True
             while contin:
                 assert self._confirmNumTiles() == 100
-                print p
-#                inp = raw_input()
+#                 p.printRack()
+#                 print "Please insert move"
+#                 inp = self._getPlayerMove()
+#                 pdb.set_trace()
+                inp = 'abc'
                 inp = "---"               
                 if inp == "---":
                     contin = False
+                    break
                 elif inp == 'abc':
                     break
                 # submit move
-                play_bag = p._isValidMove(inp)
-                if play_bag:
-                    # if valid from the players perspective, send tiles
-                    if self._board.parseMove(move_tuples=inp, tiles=play_bag,  player=p):
-                        # if valid from board's perspective
-                        # 1) submit play
-                        # 2) add to score
-                        # 3) remove tiles from players rack and transfer to board
-                        # 4) Give player new tiles
-                        continue
-                    else:
-                        p.addBag( play_bag )
-                        # repeat and submit another play
-                        
+                if self._board.parseMove(move_tuples=inp, player=p):
+                    continue
+                else:
+                    break
+#                 
+# #                     play_bag = p._isValidMove(inp)
+#                 if play_bag:
+#                     # if valid from the players perspective, send tiles
+#                     if self._board.parseMove(move_tuples=inp, tiles=play_bag,  player=p):
+#                         # if valid from board's perspective
+#                         # 1) submit play
+#                         # 2) add to score
+#                         # 3) remove tiles from players rack and transfer to board
+#                         # 4) Give player new tiles
+#                         continue
+#                     else:
+#                         p.addBag( play_bag )
+#                         # repeat and submit another play   
             if inp == "---":
                 break
+            else:
+                while True:
+                    if not p.rack.append(self.bag.getRandomTile()):
+                        break
+                    
+                
         
 #     @classmethod
     def _confirmNumTiles(self):
@@ -1034,7 +1054,29 @@ class Scrabble:
         sum += len(self.bag)
         return sum
             
-        
+    def _getPlayerMove(self):
+        valid = False
+        while not valid:
+            try:
+                inp = eval(raw_input())
+            except SyntaxError:
+                pass
+            
+            # input is a list
+            try:
+                if not isinstance(inp, list):
+                    continue
+                # input is consisting of tuples
+                if not all([isinstance(a,tuple) for a in inp]):
+                    continue
+                # All elements of tuples are string, int, int
+                if not all([all([len(el[0])==1,isinstance(el[0],str), isinstance(el[1],int),isinstance(el[2],int)]) for el in inp]):
+                    continue
+            except UnboundLocalError:
+                continue
+            
+            valid = True
+            
             
 if __name__ == "__main__":
     init() # init colorama
@@ -1043,49 +1085,50 @@ if __name__ == "__main__":
 
     sc = Scrabble()
     bo = Board()
-#    bo._board[7][6].letter = 't'
-#    bo._board[7][7].letter = 'e'
-#    bo._board[7][8].letter = 's'
-#    bo._board[7][9].letter = 't'
-#    
-#    print bo
-#    print len(sc.bag)
+# #    bo._board[7][6].letter = 't'
+# #    bo._board[7][7].letter = 'e'
+# #    bo._board[7][8].letter = 's'
+# #    bo._board[7][9].letter = 't'
+# #    
+# #    print bo
+# #    print len(sc.bag)
+#      
+# #    ts = 2 * [None]
+# #    ts[0] = Tile('a',1,3,'b')
+# #    ts[1] = Tile('c',2,4,'e')
+# #    ts.append(Tile('q',1,100,'e'))
+# #    b = Bag()
+# #    b.append(ts[0])
+# #    b.append(ts[1])
+# #    b.append(Tile('f', 1,2, 'f'))
+# #    b.append(Tile('f', 1,1, 'f'))
+# #    s = b.getLetterSet()
+# #    test_move = list('ff')
+# #    print s.issuperset(test_move)
+# #    
+# #    print 'q' in b
+#  
+# #    df = DataFrame({'Letter': list('trees'), 'Row': [2,3,4,5,6], 'Column':[8,8,8,8,8]})
+# #    test_move = DataFrame({'Letter': list('meat'), 'Row': [5,6,7,8], 'Column':[7,7,7,7]})
+# #    test_move2 = DataFrame({'Letter': list('meats'), 'Row': [5,6,7,8,6], 'Column':[7,7,7,7,8]})
+# #    
+# #    df = DataFrame({'Letter': list('trees')}, index = zip([2,3,4,5,6],[8,8,8,8,8]))
+# #    test_move = DataFrame({'Letter': list('meat')}, index=zip([5,6,7,8],[7,7,7,7]))
+# #    test_move2 = DataFrame({'Letter': list('meats')}, index = zip([5,6,7,8,6], [7,7,7,7,8]))
+#     print 'Test Parsing Moves'
+#     print(bo)
+#     test_move = [('m',5,7),('e',6,7),('a',7,7),('t',8,7)]
+#     print(bo.parseMove(test_move))
+#     print(bo)
+#     test_move = [('t', 2, 8), ('r', 3, 8), ('e', 4, 8), ('e', 5, 8)] #, ('s', 6, 8)]
+#     print(bo.parseMove(test_move))
+#     print(bo)
+#     test_move = [('s',6,8), ('m', 6, 6), ('s', 6,9)]
+#     print(bo.parseMove(test_move))
+#     print(bo)
+#     test_move = [('a', 4,6), ('i',5,6)]
+#     print(bo.parseMove(test_move))
+    print(bo)
     
-#    ts = 2 * [None]
-#    ts[0] = Tile('a',1,3,'b')
-#    ts[1] = Tile('c',2,4,'e')
-#    ts.append(Tile('q',1,100,'e'))
-#    b = Bag()
-#    b.append(ts[0])
-#    b.append(ts[1])
-#    b.append(Tile('f', 1,2, 'f'))
-#    b.append(Tile('f', 1,1, 'f'))
-#    s = b.getLetterSet()
-#    test_move = list('ff')
-#    print s.issuperset(test_move)
-#    
-#    print 'q' in b
-
-#    df = DataFrame({'Letter': list('trees'), 'Row': [2,3,4,5,6], 'Column':[8,8,8,8,8]})
-#    test_move = DataFrame({'Letter': list('meat'), 'Row': [5,6,7,8], 'Column':[7,7,7,7]})
-#    test_move2 = DataFrame({'Letter': list('meats'), 'Row': [5,6,7,8,6], 'Column':[7,7,7,7,8]})
-#    
-#    df = DataFrame({'Letter': list('trees')}, index = zip([2,3,4,5,6],[8,8,8,8,8]))
-#    test_move = DataFrame({'Letter': list('meat')}, index=zip([5,6,7,8],[7,7,7,7]))
-#    test_move2 = DataFrame({'Letter': list('meats')}, index = zip([5,6,7,8,6], [7,7,7,7,8]))
-    print 'Test Parsing Moves'
-    print(bo)
-    test_move = [('m',5,7),('e',6,7),('a',7,7),('t',8,7)]
-    print(bo.parseMove(test_move))
-    print(bo)
-    test_move = [('t', 2, 8), ('r', 3, 8), ('e', 4, 8), ('e', 5, 8)] #, ('s', 6, 8)]
-    print(bo.parseMove(test_move))
-    print(bo)
-    test_move = [('s',6,8), ('m', 6, 6), ('s', 6,9)]
-    print(bo.parseMove(test_move))
-    print(bo)
-    test_move = [('a', 4,6), ('i',5,6)]
-    print(bo.parseMove(test_move))
-    print(bo)
     
     deinit() # disable colorama
