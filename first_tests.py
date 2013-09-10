@@ -180,10 +180,13 @@ class Tile:
 
     # Compares t_id
     def __eq__(self, other):
-        if self.t_id == other.t_id:
-            return True
-        else:
+        if other is None:
             return False
+        elif isinstance(other,Tile):
+            if self.t_id == other.t_id: 
+                return True
+            else:
+                return False
 
 #    implement addition for easy word creation
     def __add__(self, other):
@@ -213,11 +216,18 @@ class Bag:
             self.bag_tiles.extend( x.bag_tiles )
             self._populateLetters()
             return True
+        if isinstance(x, list) and all([isinstance(el, Tile) for el in x]):
+            self.bag_tiles.extend( x )
+            self._populateLetters()
+            return True
         return False
 
     def remove(self, val):
+        
+        print val
+#        ###pdb.set_trace()
         tle = None
-#        pdb.set_trace()
+#        ###pdb.set_trace()
         if isinstance(val, int):
             # remove by t_id
             for t in self.bag_tiles:
@@ -225,8 +235,7 @@ class Bag:
                     tle = t
                     break
 #                    self.remove(t)
-#                    return t
-            return None
+#                    return 
         if isinstance(val,str):
             # remove by letter
             for t in self.bag_tiles:
@@ -235,7 +244,7 @@ class Bag:
                     break
 #                    self.remove(t)
 #                    return t
-            return None 
+#            return None 
         
         if isinstance(val, Tile):
             tle = val
@@ -245,11 +254,12 @@ class Bag:
             try:
                 self.bag_tiles.remove(tle)
             except ValueError:
-                return False
+                return None
             else:
                 self._populateLetters()
-                return True
-
+                return tle
+        
+        return None
         
 #    def pop(self, t_id=None, let=None):
 #        if t_id is not None:
@@ -286,7 +296,8 @@ class Bag:
         
         Returns a list of tiles if all letters in bag
         """
-        if lst not in self.bag_tiles:
+        pdb.set_trace()
+        if lst not in self:
             return False
 
         ret_lst = []
@@ -294,12 +305,18 @@ class Bag:
 #            ret_lst.append( self.pop(let = l) )
             ret_lst.append( self.remove(l) )
 
+        pdb.set_trace()
+        
+        print len(self)
+        
         if None in ret_lst:
             for tle in ret_lst:
                 self.append(tle)
             return False
         else:
             return ret_lst
+        
+        
     
     def getTileSet(self):
         return set(self.bag_tiles)
@@ -315,7 +332,7 @@ class Bag:
         pass
 
     def __contains__(self, item):
-        #       pdb.set_trace()
+        #       ###pdb.set_trace()
        # CHECK THIS IS WORKING
        print "__contains__ called"
        if isinstance(item, Tile):
@@ -366,7 +383,7 @@ class Player:
         self.p_id = p_id
         self.p_type = p_type
 
-    def _addTile(self, tile):
+    def addTile(self, tile):
         """
         Adds tile to player's rack.
         
@@ -382,7 +399,14 @@ class Player:
             return True
         else:
             return False
-        
+    
+    def getRandomTile(self, bag):
+        if len(self.rack)<7 and len(bag)>0:
+            self.rack.append( bag.getRandomTile() )
+            return True
+        else:
+            return False    
+    
     def addBag(self, bag):
         return self.rack.append(bag)
 
@@ -429,6 +453,7 @@ class Player:
             return False
 
         play_bag = self.rack.getTileFromLetters(play_letters)
+        ###pdb.set_trace()
         
         return play_bag
     
@@ -617,6 +642,7 @@ class Board:
         True
         """
         print self.parseMove.__name__
+        #pdb.set_trace()()
         # Check validity of move from player's perspective
         pdb.set_trace()
         if player is not None:
@@ -689,7 +715,8 @@ class Board:
         ###### Usage ###### 
         No direct usage.  Only used by parseMove(.) as a helper function.
         """
-#         print self._parseWords.__name__
+        #pdb.set_trace()()
+        print self._parseWords.__name__
         require_anc_word = False # for words where only attachment point is via an ancillary word
         found_anc_word = False # boolean indicating an ancillary word found
         temp_board = moves_df.append(self.board_df)
@@ -890,6 +917,8 @@ class Board:
         """
         Manipulates "ScorePoints" column of words_df and passes everything to self._insert_move
         """
+        #pdb.set_trace()()
+        print self._calcScore.__name__
         
         if not self._insert_move(moves_df, words_df, player, tile_bag):
             return False
@@ -906,6 +935,8 @@ class Board:
         updates _board nested lists 
         
         """
+        #pdb.set_trace()()
+        print self._insert_move.__name__
 #         print self._insert_move.__name__
         if player is None:
             moves_df['Player'] = None
@@ -929,6 +960,7 @@ class Board:
             self.board_df = moves_df.copy()
         self._move_num += 1
         
+        pdb.set_trace()
         self._board_bag.append( tile_bag )
 #        Use when support logic ready
 #        self._score_board = self._score_board.append()    
@@ -957,7 +989,7 @@ class Scrabble:
         #     self.n_players = input("Enter Number of Players (2-4)")
         #     if self.n_players in [2,3,4]:
         #         break
-        self.n_players = 4
+        self.n_players = 2
         self._board = Board()
         
     # Create players types and names
@@ -995,33 +1027,33 @@ class Scrabble:
 #                print (i,j)
                 new_tile = self.bag.getRandomTile()
 #                print new_tile
-                self.players[i]._addTile(new_tile)
+                self.players[i].addTile(new_tile)
+
+        print len(self.bag)
 
     # Play the Game
         for p in itertools.cycle(self.play_order):
             print self._board
             print p.rack
             print "\n\n"
-            
+            print len(self.bag)
             contin = True
             while contin:
+                print p.name
                 assert self._confirmNumTiles() == 100
-#                 p.printRack()
-#                 print "Please insert move"
-#                 inp = self._getPlayerMove()
-#                 pdb.set_trace()
-                inp = 'abc'
-                inp = "---"               
+                p.printRack()
+                print "Please insert move"
+                inp = self._getPlayerMove()
+#                 ###pdb.set_trace()()
+#                inp = "---"               
                 if inp == "---":
                     contin = False
                     break
-                elif inp == 'abc':
-                    break
                 # submit move
                 if self._board.parseMove(move_tuples=inp, player=p):
-                    continue
-                else:
                     break
+                else:
+                    continue
 #                 
 # #                     play_bag = p._isValidMove(inp)
 #                 if play_bag:
@@ -1036,11 +1068,14 @@ class Scrabble:
 #                     else:
 #                         p.addBag( play_bag )
 #                         # repeat and submit another play   
+            print len(self.bag)
             if inp == "---":
                 break
             else:
                 while True:
-                    if not p.rack.append(self.bag.getRandomTile()):
+#                    pdb.set_trace()
+                    if not p.getRandomTile(self.bag):
+#                    if not p.addTile(self.bag.getRandomTile()):
                         break
                     
                 
@@ -1058,7 +1093,11 @@ class Scrabble:
         valid = False
         while not valid:
             try:
-                inp = eval(raw_input())
+                inp = raw_input()
+                if inp != "---":
+                    inp = eval(inp)
+                else:
+                    valid=True
             except SyntaxError:
                 pass
             
@@ -1074,9 +1113,12 @@ class Scrabble:
                     continue
             except UnboundLocalError:
                 continue
+            except NameError:
+                continue
             
             valid = True
             
+        return inp
             
 if __name__ == "__main__":
     init() # init colorama
@@ -1084,6 +1126,7 @@ if __name__ == "__main__":
 #    doctest.testmod()
 
     sc = Scrabble()
+    print "\n\nScrabble() init complete\n\n"
     bo = Board()
 # #    bo._board[7][6].letter = 't'
 # #    bo._board[7][7].letter = 'e'
