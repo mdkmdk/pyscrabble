@@ -481,24 +481,13 @@ class AIPlayer(Player):
 
     
 class Board:
-    BOARD_SIZE = 15
     def __init__(self):
-#        self._board = 15 * [[]]
-#        for i in range(15):
-#            self._board[i] = []
-#            for j in range(15):
-#                self._board[i].append(Spot(i, j))
-##               self._board[i].append(None)
-##        self.board_df = DataFrame([(a,b, None, np.nan) for a in range(0,15) for b in range(0,15)], columns=['Row','Column','Letter', 't_id'])
         self._board_bag = Bag()
         self.board_df = DataFrame()
         self.moves = {}
         self._score_board = DataFrame()
         self._move_num = 1
         self._words_df = DataFrame()
-
-    def check_move(self, mve):
-        pass
 
     def __str__(self):  
         ans = "    "
@@ -576,13 +565,6 @@ class Board:
                 ans += "   " +  15 * "|______" + "|\n"
                 
         return ans
-
-#    def getSpotLetter(self, r_, c_):
-#        let = self._board[r][c].letter
-#        if let == " ":
-#            return None
-#        else:
-#            return let
     
     @staticmethod
     def load(path):
@@ -655,13 +637,15 @@ class Board:
             print "Tiles not in player's bag"
             return False
         
-        orientation = True # True = horizontal, False = vertical
+        
         try:
             moves_df = DataFrame(move_tuples, columns=['Letter', 'Row', 'Column'])
             moves_df.set_index(['Row','Column'], inplace=True, drop=False)
             moves_df['Points'] = [TILE_DICT[let][1] for let in moves_df['Letter']]
         except:
-            print "Spots are occupied"
+#            print "Spots are occupied"
+            if player is not None:
+                player.addBag(tile_bag)
             return False
         
         ### How to Determine logic for blank tiles
@@ -669,6 +653,7 @@ class Board:
         # Define Orientation of Primary Move (Not ancillary words)
         # Confirm All moves in the same row OR the same column
         # Define the main index (row/col) which the primary words resides in
+        orientation = True # True = horizontal, False = vertical
         if (len(moves_df.Row.unique()) == 1):
             orientation = True
             prim_index = moves_df.Row.unique()[0]
@@ -678,13 +663,24 @@ class Board:
             prim_index = moves_df.Column.unique()[0]
             moves_df = moves_df.sort('Row')
         else:
-            print "Invalid tile placements"
+            print "Tiles must be placed same row or column"
+            if player is not None:
+                player.addBag(tile_bag)
+            return False
+                    
+        if (moves_df.Column.min()<0 or moves_df.Row.min()<0 or moves_df.Column.max()>15 or moves_df.Row.max()>15):
+            print "Moves out of bounds"
+            if player is not None:
+                player.addBag(tile_bag)
             return False
                     
         # Confirm tiles only placed in vacant spots
         try:
             self.board_df.append(moves_df)
         except:
+            print "Played space(s) occupied"
+            if player is not None:
+                player.addBag(tile_bag)
             return False
         
         # Confirm all words created are valid words
