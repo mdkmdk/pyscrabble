@@ -9,7 +9,6 @@ import numpy as np
 import pdb
 from pandas import DataFrame, Series, isnull, notnull
 from numpy import nan
-import logging
 
 pydoc_cmd = r'U:/python/apps/run_local.bat "C:/local_runtimes_64/19.10/Lib/pydoc.py" -w first_tests'
 
