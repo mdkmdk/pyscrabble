@@ -1,0 +1,147 @@
+
+PyScrabble_gui.py,540
+from PyQt4 import QtCore, QtGuiQtCore10,267
+from PyQt4 import QtCore, QtGuiQtGui10,267
+    _fromUtf8 = QtCore.QString.fromUtf8_fromUtf813,305
+    def _fromUtf8(s):_fromUtf815,368
+    _encoding = QtGui.QApplication.UnicodeUTF8_encoding19,413
+    def _translate(context, text, disambig):_translate20,460
+    def _translate(context, text, disambig):_translate23,608
+class Ui_PyScrabble(object):Ui_PyScrabble26,723
+    def setupUi(self, PyScrabble):setupUi27,752
+    def retranslateUi(self, PyScrabble):retranslateUi65,2785
+
+__init__.py,0
+
+decorator_tests.py,974
+import win32com.clientwin32com1,0
+import win32com.clientclient1,0
+import win32com.client as win32win32com2,23
+import win32com.client as win32win322,23
+class excelSafe(object):excelSafe4,56
+    def __init__(self, f):__init__5,81
+    def __call__(self, *args, **kwargs):__call__8,129
+class CountCalls(object):CountCalls15,301
+    _instances = {}_instances28,523
+    def __init__(self, f):__init__30,548
+    def __call__(self, *args, **kwargs):__call__35,668
+    def count(self):count39,783
+    def counts():counts43,858
+def f():f48,1002
+def g():g52,1039
+class attributeAccess(object):attributeAccess55,1060
+    def __init__(self,f):__init__56,1091
+    def __call__(self, *args,**kwargs):__call__58,1137
+class safeExcel(object):safeExcel62,1251
+    def __init__(self, f):__init__63,1276
+    def __call__(self,*args,**kwargs):__call__65,1323
+def excel_test():excel_test115,2542
+def h():h128,2831
+    import doctestdoctest135,2955
+
+first_tests.py,5325
+import re, os, sys, itertools, random, picklere6,57
+import re, os, sys, itertools, random, pickleos6,57
+import re, os, sys, itertools, random, picklesys6,57
+import re, os, sys, itertools, random, pickleitertools6,57
+import re, os, sys, itertools, random, picklerandom6,57
+import re, os, sys, itertools, random, picklepickle6,57
+from colorama import init, deinit, Fore, Back, Style # Colored terminal textinit7,103
+from colorama import init, deinit, Fore, Back, Style # Colored terminal textdeinit7,103
+from colorama import init, deinit, Fore, Back, Style # Colored terminal textFore7,103
+from colorama import init, deinit, Fore, Back, Style # Colored terminal textBack7,103
+from colorama import init, deinit, Fore, Back, Style # Colored terminal textStyle7,103
+from colorama import init, deinit, Fore, Back, Style # Colored terminal textColored7,103
+from colorama import init, deinit, Fore, Back, Style # Colored terminal textterminal7,103
+from colorama import init, deinit, Fore, Back, Style # Colored terminal texttext7,103
+import numpy as npnp8,180
+import pdbpdb9,199
+from pandas import DataFrame, Series, isnull, notnullDataFrame10,210
+from pandas import DataFrame, Series, isnull, notnullSeries10,210
+from pandas import DataFrame, Series, isnull, notnullisnull10,210
+from pandas import DataFrame, Series, isnull, notnullnotnull10,210
+from numpy import nannan11,264
+import logginglogging12,286
+pydoc_cmd = r'U:/python/apps/run_local.bat "C:/local_runtimes_64/19.10/Lib/pydoc.py" -w first_tests'pydoc_cmd14,302
+COLOR_OUTPUT = TrueCOLOR_OUTPUT31,868
+MAX_WORD_LEN = 15MAX_WORD_LEN32,888
+MAX_LEN=0 # Set BelowMAX_LEN33,906
+OWNER = set(['BAG', 'BOARD']) # Append player ids once game initiatesOWNER34,928
+PLAYER_TYPE = set(['AI', 'HUMAN'])PLAYER_TYPE35,998
+MULTIPLIERS = {'TRIP_WORD':'3W', 'DOUB_WORD':'2W', 'TRIP_LET':'3L', 'DOUB_LET':'2L'}MULTIPLIERS36,1033
+sep = os.linesepsep39,1138
+    f = file('words.pickle','rb')f42,1161
+    WORDS = pickle.load(f)WORDS43,1195
+        temp = [w.rstrip(sep) for w in f]temp46,1273
+    WORDS = {}WORDS47,1315
+            w = temp.pop()w53,1427
+    f = file('words.pickle', 'wb')f59,1546
+    l = 0l64,1643
+TILE_DICT = {TILE_DICT87,2098
+MULT_LET = {}MULT_LET124,2683
+MULT_WORD = {}MULT_WORD125,2697
+trip_words = [(a,b) for a in [0,7,14] for b in [0,7,14]]trip_words128,2714
+double_words = [(a,a) for a in [1,2,3,4,10,11,12,13]]double_words133,2966
+triple_let = [(a,b) for a in [5,9] for b in [1,13]]triple_let139,3339
+double_let = [(a,b) for a in [3,11] for b in [0,14]]double_let145,3696
+class Tile:Tile163,4712
+    def __init__(self, let, scr=None, t_id=None, owner=None):__init__164,4724
+    def __hash__(self):__hash__175,5074
+    def __str__(self):__str__178,5123
+    def __eq__(self, other):__eq__182,5247
+    def __add__(self, other):__add__192,5528
+    def isLetter(let):isLetter196,5666
+class Bag:Bag202,5781
+    def __init__(self):__init__203,5792
+    def append(self,x):append207,5881
+    def remove(self, val):remove225,6470
+    def getRandomTile(self):getRandomTile280,7994
+    def exchange(self):exchange287,8202
+    def getLetterSet(self):getLetterSet290,8244
+    def getTileFromLetters(self,lst):getTileFromLetters293,8310
+    def getTileSet(self):getTileSet321,8930
+    def getLetterList(self):getLetterList324,8996
+    def _populateLetters(self):_populateLetters328,9090
+    def __contains__(self, item):__contains__334,9237
+    def __len__(self):__len__371,10526
+    def __iter__(self):__iter__374,10590
+class Player:Player379,10671
+    def __init__(self, p_id, name, p_type):__init__380,10685
+    def addTile(self, tile):addTile386,10835
+    def getRandomTile(self, bag):getRandomTile403,11235
+    def addBag(self, bag):addBag410,11437
+    def printRack(self):printRack413,11502
+    def __str__(self):__str__426,11756
+    def _isValidMove(self, move_tuples):_isValidMove429,11814
+class AIPlayer(Player):AIPlayer460,12897
+class Board:Board483,13310
+    def __init__(self):__init__484,13323
+    def __str__(self):  __str__492,13544
+    def load(path):load570,16704
+            import picklepickle575,16781
+    def save(inst,path):save586,17034
+            import picklepickle591,17116
+    def parseMove(self, move_tuples,  player=None, exchange=False):parseMove600,17336
+    def _parseWords(self, moves_df, orientation, prim_index, tile_bag, player, exchange):_parseWords697,21190
+    def _calcScore(self, moves_df, words_df, player, tile_bag):_calcScore912,31375
+    def _insert_move(self, moves_df, words_df,  player=None, tile_bag=None):_insert_move924,31775
+class Scrabble:Scrabble966,33288
+    def __init__(self):__init__981,33650
+    def _confirmNumTiles(self):_confirmNumTiles1080,37363
+    def _getPlayerMove(self):_getPlayerMove1088,37581
+    sc = Scrabble()sc1124,38683
+    bo = Board()bo1126,38748
+def getTerminalSize():getTerminalSize1177,40468
+    import osos1178,40491
+    def ioctl_GWINSZ(fd):ioctl_GWINSZ1180,40526
+            import fcntl, termios, struct, osfcntl1182,40565
+            import fcntl, termios, struct, ostermios1182,40565
+            import fcntl, termios, struct, osstruct1182,40565
+            import fcntl, termios, struct, osos1182,40565
+
+gui_tests.py,202
+from PyQt4 import import QtGuiimport9,118
+from PyQt4 import import QtGuiQtGui9,118
+    def __init__(self, Tile):__init__14,210
+    def dropEvent(self, e):dropEvent19,322
+def main():main26,444
