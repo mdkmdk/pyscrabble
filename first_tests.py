@@ -9,7 +9,7 @@ import numpy as np
 import pdb
 from pandas import DataFrame, Series, isnull, notnull
 from numpy import nan
-import logging
+
 
 pydoc_cmd = r'U:/python/apps/run_local.bat "C:/local_runtimes_64/19.10/Lib/pydoc.py" -w first_tests'
 
@@ -260,30 +260,24 @@ class Bag:
         
         return None
         
-#    def pop(self, t_id=None, let=None):
-#        if t_id is not None:
-#            for t in self.bag_tiles:
-#                if t_id == t.t_id:
-#                    self.remove(t)
-#                    return t
-#            return None
-#        elif let is not None:
-#            for t in self.bag_tiles:
-#                if t.letter == let:
-#                    self.remove(t)
-#                    return t
-#            return None 
-#        else:
-#            return None
-
     def getRandomTile(self):
         rem_tile = random.randint(0, len(self.bag_tiles)-1)
         t = self.bag_tiles[rem_tile]
         self.remove(t)
         return t
+
     
     # To Facilitate Exchanging Tiles
-    def exchange(self):
+    @staticmethod
+    def exchange(bag1, bag2, exch_lets):
+        """
+        send exch_lets:       bag2 -> bag1
+        retrieve random lets: bag1 -> bag2
+        
+        """
+        if len(exch_lets>bag1):
+            return False, "Cannot exchange {n1} letters, only {n2] letters in sack".format(n1=len(exch_lets), n2=len(bag1))
+        
         pass
     
     def getLetterSet(self):
@@ -458,27 +452,7 @@ class Player:
     
 class AIPlayer(Player):
     pass
-
-
-#class Spot:
-#    def __init__(self, r_, c_):
-#        self.r = r_
-#        self.c = c_
-#        self.letter = " "
-#        self.score = None
-#
-#    def __str__(self):
-#        return str((self.letter, self.score))
-#    
-#    def insertLetter(self):
-#        pass
-
-#class Move:
-#    def __init__(self, move_tuple):
-#        # of format (letter, row, column)
-#        pass
-
-    
+  
 class Board:
     def __init__(self):
         self._board_bag = Bag()
@@ -626,6 +600,24 @@ class Board:
         #pdb.set_trace()()
         # Check validity of move from player's perspective
         pdb.set_trace()
+
+        if exchange:
+            # move_tuples is a list of letters here
+            if move_tuples not in player.rack:
+                print 'you cannot exchange tiles you do not have'
+                return False
+            elif len(move_tuples) > len(self.rack):
+                print "cannot exchange {n1} letters, board only has {n2} letters".format(n1=len(move_tuples), n2=len(self.rack))
+                return False
+            else:
+                if Bag.exchange(self.rack, player.rack, move_tuples):
+                    return True
+                else:
+                    print 'your tile exchanged failed for an unknown reason'
+                    return False
+            
+
+        
         if player is not None:
             tile_bag = player._isValidMove(move_tuples)
         else:
@@ -1038,14 +1030,14 @@ class Scrabble:
                 assert self._confirmNumTiles() == 100
                 p.printRack()
                 print "Please insert move"
-                inp = self._getPlayerMove()
+                inp,exchange = self._getPlayerMove()
 #                 ###pdb.set_trace()()
 #                inp = "---"               
                 if inp == "---":
                     contin = False
                     break
                 # submit move
-                if self._board.parseMove(move_tuples=inp, player=p):
+                if self._board.parseMove(move_tuples=inp, player=p,exchange=exchange):
                     break
                 else:
                     continue
@@ -1086,6 +1078,7 @@ class Scrabble:
             
     def _getPlayerMove(self):
         valid = False
+        exchange = False
         while not valid:
             try:
                 inp = raw_input()
@@ -1100,6 +1093,21 @@ class Scrabble:
             
             # input is a list
             try:
+<<<<<<< HEAD
+=======
+                # exchange tiles
+                if isinstance(inp,tuple) \
+                and len(inp) == 2 \
+                and inp[0] == 'exchange' \
+                and isinstance(inp[1], list) \
+                and all([isinstance(a,str) for a in inp[0]]) \
+                and len(inp[1]) > 0 \
+                and len (inp[1]) <= 7 :
+                    valid = True
+                    exchange = True
+                    inp = inp[1]
+                    break
+>>>>>>> 2a41b0b0a5cc436265305733ebef49ea568ac8ed
                 
                 if not isinstance(inp, list):
                     continue
@@ -1121,7 +1129,7 @@ class Scrabble:
                 continue
             valid = True
             
-        return inp
+        return inp,exchange
             
 if __name__ == "__main__":
     init() # init colorama
@@ -1130,7 +1138,13 @@ if __name__ == "__main__":
 
     sc = Scrabble()
     print "\n\nScrabble() init complete\n\n"
-    bo = Board()
+    try:
+        bo = Board()
+    except NameError:
+        deinit()
+    except KeyboardInterrupt, e:
+        deinit()
+
 # #    bo._board[7][6].letter = 't'
 # #    bo._board[7][7].letter = 'e'
 # #    bo._board[7][8].letter = 's'
