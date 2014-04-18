@@ -166,7 +166,7 @@ class Tile:
             self.letter = let
         else:
             # What is the more informative way to do this?
-            raise
+            raise Exception('Print Error')
             return
         self.scr = scr
         self.owner = owner
@@ -188,16 +188,15 @@ class Tile:
             else:
                 return False
 
-#    implement addition for easy word creation
+    # implement addition for easy word creation
     def __add__(self, other):
         # logic different for if owners e ('bag','rack','board')
         return self.letter + other.letter
-
+    # Compares that 
     def isLetter(let):
         if let == self.let:
             return True
-        else:
-            return False
+        return False
 
 class Bag:
     def __init__(self):
@@ -1096,9 +1095,12 @@ class Scrabble:
                     valid=True
             except SyntaxError:
                 pass
+            except NameError:
+                pass
             
             # input is a list
             try:
+                
                 if not isinstance(inp, list):
                     continue
                 # input is consisting of tuples
@@ -1106,12 +1108,17 @@ class Scrabble:
                     continue
                 # All elements of tuples are string, int, int
                 if not all([all([len(el[0])==1,isinstance(el[0],str), isinstance(el[1],int),isinstance(el[2],int)]) for el in inp]):
+                    print "Please enter a valid move evaluable as a list of tuples where tuples are ordered as (string, int, int) \ne.g. [('a',8,8),('t',8,9)]"
                     continue
-            except UnboundLocalError:
+            except UnboundLocalError,e:
+                print UnboundLocalError, e, "Please Enter Valid Move"
                 continue
             except NameError:
+                print NameError, e, "Please Enter Valid Move"
                 continue
-            
+            except TypeError:
+                print TypeError, e, "Please Enter Valid Move"
+                continue
             valid = True
             
         return inp
@@ -1171,3 +1178,34 @@ if __name__ == "__main__":
     
     
     deinit() # disable colorama
+
+
+
+def getTerminalSize():
+    import os
+    env = os.environ
+    def ioctl_GWINSZ(fd):
+        try:
+            import fcntl, termios, struct, os
+            cr = struct.unpack('hh', fcntl.ioctl(fd, termios.TIOCGWINSZ,
+        '1234'))
+        except:
+            return
+        return cr
+    cr = ioctl_GWINSZ(0) or ioctl_GWINSZ(1) or ioctl_GWINSZ(2)
+    if not cr:
+        try:
+            fd = os.open(os.ctermid(), os.O_RDONLY)
+            cr = ioctl_GWINSZ(fd)
+            os.close(fd)
+        except:
+            pass
+    if not cr:
+        cr = (env.get('LINES', 25), env.get('COLUMNS', 80))
+
+        ### Use get(key[, default]) instead of a try/catch
+        #try:
+        #    cr = (env['LINES'], env['COLUMNS'])
+        #except:
+        #    cr = (25, 80)
+    return int(cr[1]), int(cr[0])
